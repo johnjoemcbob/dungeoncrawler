@@ -20,14 +20,15 @@ function ENT:Initialize()
 		local endpos = Vector( 4060, -6466, 1442 )
 
 		self:SetTrigger( true )
-		self:SetCollisionBounds( startpos, endpos )
+		self:SetSolid( SOLID_BBOX )
+		self:SetCollisionBoundsWS( startpos, endpos )
 		print( "CREATED" )
 	end
 end
 
 if SERVER then
 	function ENT:StartTouch( entity )
-		print( "hello... " .. entity )
+		print( "hello... " .. tostring( entity ) )
 	end
 end
 

@@ -8,10 +8,11 @@ function GM:Initialize()
 end
 
 function GM:InitPostEntity()
+	self.BaseClass:InitPostEntity()
+
 	local test = ents.Create( "dc_trigger_control" )
-	test.Initialize()
-	test.SetPos( Vector( 0, 0, 0 ) )
-	test.Spawn()
+	test:SetPos( Vector( 0, 0, 0 ) )
+	test:Spawn()
 	print( test )
 end
 
