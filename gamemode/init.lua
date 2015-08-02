@@ -13,7 +13,6 @@ function GM:InitPostEntity()
 	local test = ents.Create( "dc_trigger_control" )
 	test:SetPos( Vector( 0, 0, 0 ) )
 	test:Spawn()
-	print( test )
 
 	local chesttest = ents.Create( "dc_chest_map" )
 	chesttest:SetPos( Vector( 8808, -55, -350 ) )

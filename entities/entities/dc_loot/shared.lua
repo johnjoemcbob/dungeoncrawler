@@ -47,6 +47,12 @@ end
 
 if SERVER then
 	function ENT:Think()
+		-- Play the loot halo effect
+		local forward = self:GetUp()
+		local effectdata = EffectData()
+			effectdata:SetOrigin( self:GetPos() )
+			effectdata:SetAngles( self:GetAngles() )
+		self.OpenEffect = util.Effect( "dc_loothalo", effectdata )
 	end
 end
 
@@ -60,7 +66,7 @@ if CLIENT then
 		local oldscale = round( self:GetModelScale(), 3 )
 		if ( oldscale == self.StartScale ) then
 			-- Reset to the original position after playing the opening animation
-			self:SetPos( self.DefaultPos )
+			--self:SetPos( self.DefaultPos )
 
 			self.TargetScale = self.MinScale
 		elseif ( oldscale == self.MinScale ) then
@@ -88,5 +94,18 @@ if CLIENT then
 		end
 
 		self:DrawModel()
+
+		-- Light up the loot tome
+		local dlight = DynamicLight( self:EntIndex() )
+		if ( dlight ) then
+			dlight.pos = self:GetPos()
+			dlight.r = 255
+			dlight.g = 150
+			dlight.b = 200
+			dlight.brightness = 1
+			dlight.Decay = 1000
+			dlight.Size = 128
+			dlight.DieTime = CurTime() + 1
+		end
 	end
 end

@@ -29,6 +29,9 @@ ENT.Chest = null
 -- The loot entity deployed by this chest
 ENT.Loot = null
 
+-- The particle system deployed as this chest opens
+ENT.OpenEffect = null
+
 function ENT:Initialize()
 	if SERVER then
 		-- Find the chest by the closest rotating 'door' (the lid)
@@ -71,6 +74,13 @@ if SERVER then
 		self.Loot = ents.Create( "dc_loot" )
 		self.Loot:SetPos( self:GetPos() )
 		self.Loot:Spawn()
+
+		-- Spawn the particle system
+		local forward = self:GetUp()
+		local effectdata = EffectData()
+			effectdata:SetOrigin( self:GetPos() )
+			effectdata:SetAngles( self:GetAngles() + Angle( 90 * forward.x, 90 * forward.y, 90 * forward.z ) )
+		self.OpenEffect = util.Effect( "dc_chestopen", effectdata )
 
 		-- Flag not to give loot more than once
 		self.IsOpen = true
