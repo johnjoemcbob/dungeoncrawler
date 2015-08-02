@@ -14,6 +14,10 @@ function GM:InitPostEntity()
 	test:SetPos( Vector( 0, 0, 0 ) )
 	test:Spawn()
 	print( test )
+
+	local chesttest = ents.Create( "dc_chest_map" )
+	chesttest:SetPos( Vector( 8808, -55, -350 ) )
+	chesttest:Spawn()
 end
 
 function GM:Think()

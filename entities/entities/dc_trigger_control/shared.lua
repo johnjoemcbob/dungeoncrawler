@@ -22,13 +22,16 @@ function ENT:Initialize()
 		self:SetTrigger( true )
 		self:SetSolid( SOLID_BBOX )
 		self:SetCollisionBoundsWS( startpos, endpos )
-		print( "CREATED" )
 	end
 end
 
 if SERVER then
 	function ENT:StartTouch( entity )
-		print( "hello... " .. tostring( entity ) )
+		
+	end
+
+	function ENT:EndTouch( entity )
+		
 	end
 end
 
