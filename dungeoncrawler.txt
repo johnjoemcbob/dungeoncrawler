@@ -1,0 +1,7 @@
+"dungeoncrawler"
+{
+	"base"		"fretta13"
+	"title"		"Dungeon Crawler"
+	"maps"		"^dc_"
+	"menusystem"	"1"
+}
