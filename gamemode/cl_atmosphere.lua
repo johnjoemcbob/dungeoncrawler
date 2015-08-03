@@ -26,7 +26,7 @@ function AtmosphereThink()
 	-- NOTE: This is used for muffling the rain sounds and lightening the screen inside
 	local tr = util.TraceLine(
 		{
-			start = LocalPlayer():EyePos(),
+			start = LocalPlayer():EyePos() + Vector( 0, 0, 1 ) * 20,
 			endpos = LocalPlayer():EyePos() + Vector( 0, 0, 1 ) * 300,
 		}
 	)

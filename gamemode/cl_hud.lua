@@ -1,11 +1,6 @@
 -- Matthew Cormack (@johnjoemcbob), Nichlas Rager (@dasomeone), Jordan Brown (@DrMelon)
--- 02/08/15
--- Main clientside logic
-
-include( "shared.lua" )
-include( "sh_controlpoints.lua" )
-include( "cl_atmosphere.lua" )
-include( "cl_hud.lua" )
+-- 03/08/15
+-- Main clientside hud visuals
 
 function GM:Initialize()
 	self.BaseClass:Initialize()

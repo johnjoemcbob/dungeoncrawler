@@ -2,8 +2,9 @@
 -- 02/08/15
 -- Main serverside logic
 
-AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "cl_atmosphere.lua" )
+AddCSLuaFile( "cl_hud.lua" )
+AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
 AddCSLuaFile( "sh_controlpoints.lua" )
 
@@ -17,6 +18,7 @@ end
 function GM:InitPostEntity()
 	self.BaseClass:InitPostEntity()
 
+	-- Load trigger positions and other data from sh_controlpoints.lua
 	for k, v in pairs( self.ControlPoints ) do
 		v.Entity = ents.Create( "dc_trigger_control" )
 			v.Entity:SetPos( v.Position )
