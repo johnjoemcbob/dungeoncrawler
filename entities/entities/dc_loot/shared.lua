@@ -85,7 +85,7 @@ if CLIENT then
 		-- Move on the Z axis depending on the opening chest animation and the scale of the loot
 		if ( oldscale < self.MinScale ) then
 			-- These aren't very pretty magical numbers but it works
-			self:SetPos( self.DefaultPos + Vector( 0, 0, -30 + ( oldscale - self.StartScale ) * 30 ) )
+			self:SetPos( self.DefaultPos + Vector( 0, 0, -30 + ( oldscale - self.StartScale ) * 10 ) )
 		else
 			self:SetPos( self:GetPos() + Vector( 0, 0, ( 1 - oldscale ) * 0.1 ) )
 

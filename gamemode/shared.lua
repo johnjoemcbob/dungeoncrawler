@@ -1,7 +1,14 @@
+-- Matthew Cormack (@johnjoemcbob), Nichlas Rager (@dasomeone), Jordan Brown (@DrMelon)
+-- 02/08/15
+-- Main shared info/logic
+-- Mostly contains changes to fretta base settings
+
+include( "sh_controlpoints.lua" )
+
 GM.Name 	= "Dungeon Crawler"
-GM.Author 	= "Matthew Cormack (@johnjoemcbob)"
+GM.Author 	= "\nMatthew Cormack (@johnjoemcbob)\nNichlas Rager (@dasomeone)\nJordan Brown (@DrMelon)"
 GM.Email 	= ""
-GM.Website 	= "www.johnjoemcbob.co.uk"
+GM.Website 	= "www.johnjoemcbob.com\nwww.nrager.co.uk\nwww.doctor-melon.com/"
 GM.Help		= "No Help Available"
 
 GM.TeamBased = true					-- Team based game or a Free For All game?
@@ -25,7 +32,7 @@ GM.PlayerCanNoClip = false			-- When true, players can use noclip without sv_che
 GM.TakeFragOnSuicide = true			-- -1 frag on suicide
 
 GM.MaximumDeathLength = 0			-- Player will repspawn if death length > this (can be 0 to disable)
-GM.MinimumDeathLength = 2			-- Player has to be dead for at least this long
+GM.MinimumDeathLength = 0			-- Player has to be dead for at least this long
 GM.AutomaticTeamBalance = false     -- Teams will be periodically balanced 
 GM.ForceJoinBalancedTeams = false	-- Players won't be allowed to join a team if it has more players than another team
 GM.RealisticFallDamage = true		-- Set to true if you want realistic fall damage instead of the fix 10 damage.
@@ -56,10 +63,8 @@ GM.CanOnlySpectateOwnTeam = true; -- you can only spectate players on your own t
 
 DeriveGamemode( "fretta13" )
 
-TEAM_GREEN 		= 1
-TEAM_ORANGE 	= 2
-TEAM_BLUE 		= 3
-TEAM_RED 		= 4
+TEAM_HERO 		= 1
+TEAM_MONSTER 	= 2
 
 --[[
    Name: gamemode:CreateTeams()
@@ -69,18 +74,12 @@ TEAM_RED 		= 4
 function GM:CreateTeams()
 
 	if ( !GAMEMODE.TeamBased ) then return end
+
+	team.SetUp( TEAM_HERO, "Heroes", Color( 80, 150, 255 ) )
+	team.SetSpawnPoint( TEAM_HERO, "info_player_start", true )
 	
-	team.SetUp( TEAM_GREEN, "Green Team", Color( 70, 230, 70 ), true )
-	team.SetSpawnPoint( TEAM_GREEN, "info_player_start" ) -- The list of entities can be a table
-	
-	team.SetUp( TEAM_ORANGE, "Orange Team", Color( 255, 200, 50 ) )
-	team.SetSpawnPoint( TEAM_ORANGE, "info_player_start", true )
-	
-	team.SetUp( TEAM_BLUE, "Blue Team", Color( 80, 150, 255 ) )
-	team.SetSpawnPoint( TEAM_BLUE, "info_player_start", true )
-	
-	team.SetUp( TEAM_RED, "Red Team", Color( 255, 80, 80 ) )
-	team.SetSpawnPoint( TEAM_RED, "info_player_start", true )
+	team.SetUp( TEAM_MONSTER, "Monsters", Color( 255, 80, 80 ) )
+	team.SetSpawnPoint( TEAM_MONSTER, "info_player_start", true )
 	
 	team.SetUp( TEAM_SPECTATOR, "Spectators", Color( 200, 200, 200 ), true )
 	team.SetSpawnPoint( TEAM_SPECTATOR, "info_player_start" )

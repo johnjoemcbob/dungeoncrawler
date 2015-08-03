@@ -11,7 +11,7 @@ function EFFECT:Think()
 end
 
 function EFFECT:Render()
-	local vOffset = Data:GetOrigin() + Vector( 0, 0, -30 )
+	local vOffset = Data:GetOrigin() + Vector( 0, 0, -25 )
 	local vAngle = Data:GetAngles()
 
 	local emitter = ParticleEmitter( vOffset, false )
@@ -27,14 +27,14 @@ function EFFECT:Render()
 				particle:SetVelocity( Vector( x * self.radius, y * self.radius, 0 ) )
 				particle:SetColor( 255, 102, 0 )
 				particle:SetLifeTime( 0 )
-				particle:SetDieTime( 1 )
+				particle:SetDieTime( self.radius / 20 )
 				particle:SetStartAlpha( 255 )
 				particle:SetEndAlpha( 0 )
 				particle:SetStartSize( 0.1 )
 				particle:SetStartLength( 1 )
 				particle:SetEndSize( 5 )
 				particle:SetEndLength( 4 )
-				particle:SetGravity( Vector( 0, 0, 50 ) )
+				particle:SetGravity( Vector( 0, 0, 0 ) )
 			end
 		end
 	emitter:Finish()
