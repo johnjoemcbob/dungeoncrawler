@@ -9,6 +9,8 @@
 -- A PrecedingPoint value of 0 or below can be added to opt out
 -- and make this a stand alone point (i.e. the first point or
 -- a bonus/secret point)
+--
+-- Time is currently in seconds
 
 GM.ControlPoints = {}
 
@@ -21,7 +23,8 @@ table.insert(
 		Position = Vector( 7113, -475, -543 ),
 		Start = Vector( 6763, -685, -543 ),
 		End = Vector( 7462, -332, -337 ),
-		PrecedingPoint = 0 -- First point
+		PrecedingPoint = 0, -- First point
+		CaptureSpeed = 80
 	}
 )
 -- Point 2
@@ -33,6 +36,7 @@ table.insert(
 		Position = Vector( 5374, -6448, -178 ),
 		Start = Vector( 5195, -6628, -178 ),
 		End = Vector( 5553, -6269, 720 ),
-		PrecedingPoint = 1
+		PrecedingPoint = 1,
+		CaptureSpeed = 50
 	}
 )

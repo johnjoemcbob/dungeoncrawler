@@ -24,6 +24,7 @@ function GM:InitPostEntity()
 			v.Entity.EndPos = v.End
 			v.Entity.ZoneName = v.Title
 			v.Entity.Type = v.Type
+			v.Entity.CaptureSpeed = v.CaptureSpeed
 			if ( v.PrecedingPoint >= 1 ) then
 				v.Entity.PrecedingPoint = self.ControlPoints[v.PrecedingPoint].Entity
 			end
