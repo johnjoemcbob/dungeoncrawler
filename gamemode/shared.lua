@@ -40,7 +40,7 @@ GM.AddFragsToTeamScore = true		-- Adds player's individual kills to team score (
 
 GM.NoAutomaticSpawning = false		-- Players don't spawn automatically when they die, some other system spawns them
 GM.RoundBased = false				-- Round based, like CS
-GM.RoundLength = 30					-- Round length, in seconds
+GM.RoundLength = 0					-- Round length, in seconds
 GM.RoundPreStartTime = 5			-- Preperation time before a round starts
 GM.RoundPostLength = 8				-- Seconds to show the 'x team won!' screen at the end of a round
 GM.RoundEndsWhenOneTeamAlive = true	-- CS Style rules
@@ -63,8 +63,10 @@ GM.CanOnlySpectateOwnTeam = true; -- you can only spectate players on your own t
 
 DeriveGamemode( "fretta13" )
 
+TEAM_NONE		= 0
 TEAM_HERO 		= 1
 TEAM_MONSTER 	= 2
+TEAM_BOTH		= 3
 
 --[[
    Name: gamemode:CreateTeams()

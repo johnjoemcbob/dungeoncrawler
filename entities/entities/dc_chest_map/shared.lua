@@ -76,10 +76,9 @@ if SERVER then
 		self.Loot:Spawn()
 
 		-- Spawn the particle system
-		local forward = self:GetUp()
 		local effectdata = EffectData()
 			effectdata:SetOrigin( self:GetPos() )
-			effectdata:SetAngles( self:GetAngles() + Angle( 90 * forward.x, 90 * forward.y, 90 * forward.z ) )
+			effectdata:SetAngles( self:GetAngles() )
 		self.OpenEffect = util.Effect( "dc_chestopen", effectdata )
 
 		-- Flag not to give loot more than once

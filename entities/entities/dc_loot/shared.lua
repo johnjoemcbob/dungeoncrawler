@@ -27,10 +27,10 @@ ENT.StartScale = 0.1
 ENT.MinScale = 0.8
 ENT.MaxScale = 1.2
 ENT.TargetScale = ENT.MinScale
-ENT.IcrementScale = 0.2
+ENT.IcrementScale = 0.4
 
 -- The speed at which to rotate the loot, multiplied by FrameTime()
-ENT.RotationSpeed = 20
+ENT.RotationSpeed = 40
 
 function ENT:Initialize()
 	self:SetModel( "models/props_lab/binderblue.mdl" )

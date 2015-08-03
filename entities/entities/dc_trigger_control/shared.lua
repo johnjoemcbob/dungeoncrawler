@@ -27,14 +27,23 @@ ENT.ZoneType = "Default"
 -- The height at which to display the zone's name above the ground
 ENT.TitleHeight = 200
 
--- The flag for whether or not the control point is being captured
-ENT.IsCapturing = false
+-- The flag for which team is capturing the control point (TEAM_NONE,TEAM_HERO,TEAM_MONSTER)
+ENT.TeamCapturing = TEAM_NONE
 
 -- The current percentage of capture by the heroes
 ENT.CaptureProgress = 0
 
 -- The speed at which heroes can capture (multiplied by the heroes present)
 ENT.CaptureSpeed = 50
+
+-- The points to be awarded to the capturing players
+ENT.CaptureScore = 2
+
+-- The speed at which time reverts capture progress
+ENT.RevertSpeed = ENT.CaptureSpeed / 4
+
+-- The speed at which monsters revert capture progress
+ENT.RevertSpeedMonster = ENT.RevertSpeed * 2
 
 -- The flag for whether or not this control point is monster controlled
 ENT.MonsterControlled = true
@@ -89,6 +98,7 @@ if SERVER then
 
 		-- Check for capture ability against the changed number of contained players
 		self:CompairTeamNumbers()
+		print( "enter "..self.ZoneName )
 	end
 
 	function ENT:RemovePlayer( ply )
@@ -102,41 +112,76 @@ if SERVER then
 
 		-- Check for capture ability against the changed number of contained players
 		self:CompairTeamNumbers()
-		print( "exit" )
+		print( "exit "..self.ZoneName )
 	end
 
 	-- Function to compare the number of heroes and monsters inside the zone,
 	-- to decide if it can be captured
-	-- NOTE: Flags ENT.IsCapturing to allow ENT:Think to run capturing logic
+	-- NOTE: Flags ENT.TeamCapturing to allow ENT:Think to run capturing logic
 	function ENT:CompairTeamNumbers()
-		local capture = false
+		local capture = TEAM_NONE
 			local heroes = false
 			local monsters = false
 			for k, ply in pairs( self.PlayersContained ) do
-				if ( ply:Team() == 1 ) then
+				if ( ply:Team() == TEAM_HERO ) then
 					heroes = true
-				elseif ( ply:Team() == 2 ) then
+				elseif ( ply:Team() == TEAM_MONSTER ) then
 					monsters = true
 				end
 			end
-			-- Heroes are present but monsters aren't, capture
+			-- Heroes are present and monsters aren't, capture
 			if ( heroes and ( not monsters ) ) then
-				capture = true
+				capture = TEAM_HERO
 			end
-		self.IsCapturing = capture
+			-- Monsters are present and heroes aren't, capture
+			if ( monsters and ( not heroes ) ) then
+				capture = TEAM_MONSTER
+			end
+			if ( heroes and monsters ) then
+				capture = TEAM_BOTH
+			end
+			-- Can only capture if the point has no preceding points,
+			-- or those have been captured already
+			if ( self.PrecedingPoint and ( self.PrecedingPoint.MonsterControlled ) ) then
+				capture = TEAM_NONE
+			end
+		self.TeamCapturing = capture
 	end
 
 	function ENT:Think()
-		-- Heroes are capturing and haven't already captured
-		if ( self.IsCapturing and self.MonsterControlled ) then
-			self.CaptureProgress = self.CaptureProgress + ( FrameTime() * self.CaptureSpeed )
+		-- Point hasn't been captured
+		if ( self.MonsterControlled ) then
+			-- Heroes are capturing
+			if ( self.TeamCapturing == TEAM_HERO ) then
+				self.CaptureProgress = self.CaptureProgress + ( FrameTime() * self.CaptureSpeed )
+				print( self.CaptureProgress )
 
-			-- Flag that the heroes have won this point
-			if ( self.CaptureProgress >= 100 ) then
-				self.CaptureProgress = 100
-				self.MonsterControlled = false
-				self.IsCapturing = false
-				print( "capd")
+				-- Flag that the heroes have won this point
+				if ( self.CaptureProgress >= 100 ) then
+					self.CaptureProgress = 100
+					self.MonsterControlled = false
+					self.TeamCapturing = false
+					print( "capd "..self.ZoneName )
+
+					-- Add score to any players inside at this point
+					for k, ply in pairs( self.PlayersContained ) do
+						ply:AddFrags( self.CaptureScore )
+					end
+				end
+			-- Heroes are losing progress
+			elseif ( self.CaptureProgress > 0 ) then
+				-- Monsters are erasing hero capture progress
+				-- NOTE: Monsters can only revert before the heroes capture 100%
+				if ( self.TeamCapturing == TEAM_MONSTER ) then
+					self.CaptureProgress = self.CaptureProgress - ( FrameTime() * self.RevertSpeedMonster )
+					print( self.CaptureProgress )
+				end
+				-- Time is erasing hero capture progress
+				-- NOTE: Time can only revert before the heroes capture 100%
+				if ( self.TeamCapturing == TEAM_NONE ) then
+					self.CaptureProgress = self.CaptureProgress - ( FrameTime() * self.RevertSpeed )
+					print( self.CaptureProgress )
+				end
 			end
 		end
 	end

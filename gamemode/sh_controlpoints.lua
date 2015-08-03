@@ -32,7 +32,7 @@ table.insert(
 		Type = "Default",
 		Position = Vector( 5374, -6448, -178 ),
 		Start = Vector( 5195, -6628, -178 ),
-		End = Vector( 5553, -6269, 680 ),
+		End = Vector( 5553, -6269, 720 ),
 		PrecedingPoint = 1
 	}
 )
