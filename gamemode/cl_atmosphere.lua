@@ -3,6 +3,7 @@
 -- Clientside atmospheric additions
 
 local LastRainEffect = 0
+local LastMonsterSoundEffect = 0
 
 local ps_default_brightness = -0.07
 local ps_default_contrast = 1
@@ -56,6 +57,7 @@ function AtmosphereThink()
 	end
 
 	Think_Sound_Rain()
+	Think_Sound_Monster()
 end
 hook.Add( "Think", "", AtmosphereThink )
 
@@ -80,6 +82,26 @@ function Think_Sound_Rain()
 		pitch = math.Approach( Sound_Rain:GetPitch(), 100, 2 )
 		Sound_Rain:SetSoundLevel( soundlevel )
 		Sound_Rain:ChangePitch( pitch )
+	end
+end
+
+function Think_Sound_Monster()
+	if ( ( not LocalPlayer().Inside ) and ( CurTime() > LastMonsterSoundEffect ) ) then
+		local sign = { -1, 1 }
+		EmitSound(
+			"dungeoncrawler/monster0"..math.random( 1, 5 )..".wav",
+			LocalPlayer():GetPos() + Vector(
+				math.random( 200, 400 ) * sign[ math.random( #sign ) ],
+				math.random( 200, 400 ) * sign[ math.random( #sign ) ],
+				0
+			),
+			LocalPlayer():EntIndex(),
+			CHAN_AUTO,
+			math.random( 10, 20 ) / 100, SNDLVL_25dB,
+			0,
+			math.random( 90, 110 )
+		)
+		LastMonsterSoundEffect = CurTime() + math.random( 10, 20 )
 	end
 end
 
