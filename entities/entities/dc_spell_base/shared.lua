@@ -1,59 +1,18 @@
 -- Matthew Cormack (@johnjoemcbob)
--- 02/08/15
--- Control Point Trigger Zone
--- This checks for the number of heroes/monsters inside it and,
--- if only one side is present, will start capturing
+-- 04/08/15
+-- Base entity for spells in the gamemode
+-- When the player activates an ability, a child of this entity will be spawned
+-- which will decide the functionality of the spell
 
 if SERVER then
 	AddCSLuaFile( "shared.lua" )
 end
 
 if CLIENT then
-	ENT.PrintName = "Control Point Trigger Zone"
+	ENT.PrintName = "Base Spell"
 end
 
 ENT.Type = "anim"
-
--- The bounding box corner positions for this trigger
-ENT.StartPos = Vector( 0, 0, 0 )
-ENT.EndPos = Vector( 1, 1, 1 )
-
--- The name of this trigger zone
-ENT.ZoneName = "Control Point"
-
--- The type of control point this is
-ENT.ZoneType = "Default"
-
--- The height at which to display the zone's name above the ground
-ENT.TitleHeight = 200
-
--- The flag for which team is capturing the control point (TEAM_NONE,TEAM_HERO,TEAM_MONSTER)
-ENT.TeamCapturing = TEAM_NONE
-
--- The current percentage of capture by the heroes
-ENT.CaptureProgress = 0
-
--- The speed at which heroes can capture (multiplied by the heroes present)
-ENT.CaptureSpeed = 50
-
--- The points to be awarded to the capturing players
-ENT.CaptureScore = 2
-
--- The speed at which time reverts capture progress
-ENT.RevertSpeed = ENT.CaptureSpeed / 4
-
--- The speed at which monsters revert capture progress
-ENT.RevertSpeedMonster = ENT.RevertSpeed * 2
-
--- The flag for whether or not this control point is monster controlled
-ENT.MonsterControlled = true
-
--- The point preceding this one, which must be captured before this becomes available
--- NOTE: Can be nil, for bonus/secret control points
-ENT.PrecedingPoint = nil
-
--- List of the contained players inside this trigger zone
-ENT.PlayersContained = nil
 
 function ENT:Initialize()
 	if SERVER then
@@ -64,31 +23,6 @@ function ENT:Initialize()
 		self:SetCollisionGroup( COLLISION_GROUP_IN_VEHICLE )
 
 		self.PlayersContained = {}
-	end
-end
-
--- NET message initialization and send logic
-if SERVER then
-	util.AddNetworkString( "DC_Client_ControlPoint" )
-
-	-- NOTE: ply can be a single player or a table of players
-	function ENT:SendClientInformation_Inside( ply )
-		-- Send the relevant information about this control point to any players within it
-		net.Start( "DC_Client_ControlPoint" )
-			net.WriteString( self.ZoneName )
-			net.WriteFloat( tonumber( self.CaptureProgress or 0 ) )
-			net.WriteFloat( tonumber( self.TeamCapturing or 0 ) )
-		net.Send( ply )
-	end
-
-	-- NOTE: ply can be a single player or a table of players
-	function ENT:SendClientInformation_Outside( ply )
-		-- Send the null information to blank the player's HUD of the point they just exited
-		net.Start( "DC_Client_ControlPoint" )
-			net.WriteString( "" )
-			net.WriteFloat( 0 )
-			net.WriteFloat( 0 )
-		net.Send( ply )
 	end
 end
 

@@ -14,3 +14,13 @@ end
 function GM:Think()
 	self.BaseClass:Think()
 end
+
+-- Setup view model hands for cast weapon
+hook.Add( "PostDrawViewModel", "DC_PostDrawViewModel_Hands", function( vm, ply, weapon )
+	if ( weapon.UseHands or ( not weapon:IsScripted() ) ) then
+		local hands = LocalPlayer():GetHands()
+		if ( IsValid( hands ) ) then
+			hands:DrawModel()
+		end
+	end
+end )

@@ -5,9 +5,9 @@
 local LastRainEffect = 0
 local LastMonsterSoundEffect = 0
 
-local ps_default_brightness = -0.07
+local ps_default_brightness = -0.12
 local ps_default_contrast = 1
-local ps_default_colour = 1
+local ps_default_colour = 0.85
 
 local ps_dark_brightness = -0.17
 local ps_dark_contrast = 1
@@ -20,7 +20,7 @@ local DC_PS_Colour = ps_default_colour
 function AtmosphereInit()
 	
 end
-hook.Add( "Initialize", "", AtmosphereInit )
+hook.Add( "Initialize", "DC_Initialize_Atmosphere", AtmosphereInit )
 
 function AtmosphereThink()
 	-- Find if the player is inside
@@ -59,7 +59,7 @@ function AtmosphereThink()
 	Think_Sound_Rain()
 	Think_Sound_Monster()
 end
-hook.Add( "Think", "", AtmosphereThink )
+hook.Add( "Think", "DC_Think_Atmosphere", AtmosphereThink )
 
 local Sound_Rain = nil
 function Think_Sound_Rain()

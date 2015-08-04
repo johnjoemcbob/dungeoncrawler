@@ -15,7 +15,7 @@ GM.TeamBased = true					-- Team based game or a Free For All game?
 GM.AllowAutoTeam = true				-- Allow auto-assign?
 GM.AllowSpectating = true			-- Allow people to spectate during the game?
 GM.SecondsBetweenTeamSwitches = 10	-- The minimum time between each team change?
-GM.GameLength = 15					-- The overall length of the game
+GM.GameLength = 500					-- The overall length of the game
 GM.RoundLimit = -1					-- Maximum amount of rounds to be played in round based games
 GM.VotingDelay = 5					-- Delay between end of game, and vote. if you want to display any extra screens before the vote pops up
 GM.ShowTeamName = true				-- Show the team name on the HUD
@@ -28,7 +28,7 @@ GM.NoPlayerTeamDamage = true		-- Allow team-members to hurt each other?
 GM.NoPlayerPlayerDamage = false 	-- Allow players to hurt each other?
 GM.NoNonPlayerPlayerDamage = false 	-- Allow damage from non players (physics, fire etc)
 GM.NoPlayerFootsteps = false		-- When true, all players have silent footsteps
-GM.PlayerCanNoClip = false			-- When true, players can use noclip without sv_cheats
+GM.PlayerCanNoClip = true			-- When true, players can use noclip without sv_cheats
 GM.TakeFragOnSuicide = true			-- -1 frag on suicide
 
 GM.MaximumDeathLength = 0			-- Player will repspawn if death length > this (can be 0 to disable)

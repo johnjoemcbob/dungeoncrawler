@@ -24,7 +24,7 @@ table.insert(
 		Start = Vector( 6763, -685, -543 ),
 		End = Vector( 7462, -332, -337 ),
 		PrecedingPoint = 0, -- First point
-		CaptureSpeed = 80
+		CaptureSpeed = 280
 	}
 )
 -- Point 2
@@ -37,6 +37,6 @@ table.insert(
 		Start = Vector( 5195, -6628, -178 ),
 		End = Vector( 5553, -6269, 720 ),
 		PrecedingPoint = 1,
-		CaptureSpeed = 50
+		CaptureSpeed = 250
 	}
 )

@@ -50,6 +50,7 @@ function GM:PlayerSpawn( ply )
 	-- Temp
 	if ( ply:Team() == TEAM_HERO ) then
 		ply:SetModel( player_manager.TranslatePlayerModel( "male11" ) )
+		ply:Give( "dc_magichand" )
 	else
 		ply:SetModel( player_manager.TranslatePlayerModel( "corpse" ) )
 	end
@@ -68,3 +69,17 @@ function GM:PlayerDisconnected( ply )
 		ply.TriggerZone:RemovePlayer( ply )
 	end
 end
+
+hook.Add( "PlayerSpawn", "DC_PlayerSpawn_HandsSetup", function( ply )
+	ply:SetupHands() -- Create the hands view model and call GM:PlayerSetHandsModel
+end )
+
+hook.Add( "PlayerSetHandsModel", "DC_PlayerSetHandsModel_Hands", function( ply, ent )
+	local simplemodel = player_manager.TranslateToPlayerModelName( ply:GetModel() )
+	local info = player_manager.TranslatePlayerHands( simplemodel )
+	if ( info ) then
+		ent:SetModel( info.model )
+		ent:SetSkin( info.skin )
+		ent:SetBodyGroups( info.body )
+	end
+end )
