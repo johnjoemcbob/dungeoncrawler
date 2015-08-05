@@ -9,6 +9,9 @@ include( "cl_hud.lua" )
 
 function GM:Initialize()
 	self.BaseClass:Initialize()
+
+	-- Used to setup the control point map, function located within cl_hud.lua
+	Initialize_HUD( self )
 end
 
 function GM:Think()

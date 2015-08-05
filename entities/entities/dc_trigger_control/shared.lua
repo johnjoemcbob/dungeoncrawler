@@ -53,6 +53,8 @@ ENT.MonsterControlled = true
 ENT.PrecedingPoint = nil
 
 -- List of the contained players inside this trigger zone
+-- NOTE: The table must be created inside Initialize so that it is not shared
+-- between all trigger zones
 ENT.PlayersContained = nil
 
 function ENT:Initialize()

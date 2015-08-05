@@ -38,9 +38,6 @@ local ViewModel_Angle_Roll = 0
 function SWEP:Initialize()
 --
 	self:SetWeaponHoldType( "fist" )
-	self:NetworkVar( "Float", 0, "NextMeleeAttack" )
-	self:NetworkVar( "Float", 1, "NextIdle" )
-	self:NetworkVar( "Int", 2, "Combo" )
 --
 end
 
@@ -60,9 +57,7 @@ function SWEP:PreDrawViewModel( vm, wep, ply )
 end
 
 function SWEP:SetupDataTables()
-	self:NetworkVar( "Float", 0, "NextMeleeAttack" )
-	self:NetworkVar( "Float", 1, "NextIdle" )
-	self:NetworkVar( "Int", 2, "Combo" )
+	self:NetworkVar( "Float", 0, "NextIdle" )
 end
 
 function SWEP:UpdateNextIdle()
@@ -70,12 +65,31 @@ function SWEP:UpdateNextIdle()
 	self:SetNextIdle( CurTime() + vm:SequenceDuration() )
 end
 
+local NextCast1= 0
 function SWEP:PrimaryAttack( right )
+	if ( SERVER ) then
+		if ( CurTime() > NextCast1 ) then
+			local spell = ents.Create( self.Owner.Spells[1] )
+			spell:Spawn()
+			spell:Cast( self.Owner )
 
+			NextCast1 = CurTime() + 0.5
+		end
+	end
 end
 
+local NextCast2 = 0
 function SWEP:SecondaryAttack()
+	if ( SERVER ) then
+		if ( CurTime() > NextCast2 ) then
+			print( "cast" )
+			local spell = ents.Create( self.Owner.Spells[2] )
+			spell:Spawn()
+			spell:Cast( self.Owner )
 
+			NextCast2 = CurTime() + 0.5
+		end
+	end
 end
 
 function SWEP:OnRemove()

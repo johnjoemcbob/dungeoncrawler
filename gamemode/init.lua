@@ -51,6 +51,11 @@ function GM:PlayerSpawn( ply )
 	if ( ply:Team() == TEAM_HERO ) then
 		ply:SetModel( player_manager.TranslatePlayerModel( "male11" ) )
 		ply:Give( "dc_magichand" )
+
+		ply.Spells = {
+			"dc_spell_projectile_fireball",
+			"dc_spell_base"
+		}
 	else
 		ply:SetModel( player_manager.TranslatePlayerModel( "corpse" ) )
 	end
@@ -68,6 +73,19 @@ function GM:PlayerDisconnected( ply )
 	if ( ply.TriggerZone and IsValid( ply.TriggerZone ) ) then
 		ply.TriggerZone:RemovePlayer( ply )
 	end
+end
+
+function GM:ShouldCollide( ent1, ent2 )
+	-- Spells fired by your own team should not collide with you
+	if
+		( ent1:IsSpell() and ent2:IsPlayer() ) or
+		( ent1:IsPlayer() and ent2:IsSpell() )
+	then
+		if ( ent1:Team() == ent2:Team() ) then
+			return false
+		end
+	end
+	return true
 end
 
 hook.Add( "PlayerSpawn", "DC_PlayerSpawn_HandsSetup", function( ply )
