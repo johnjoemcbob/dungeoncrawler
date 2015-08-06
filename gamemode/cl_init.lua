@@ -4,14 +4,19 @@
 
 include( "shared.lua" )
 include( "sh_controlpoints.lua" )
+include( "sh_buff.lua" )
 include( "cl_atmosphere.lua" )
 include( "cl_hud.lua" )
+include( "cl_buff.lua" )
 
 function GM:Initialize()
 	self.BaseClass:Initialize()
 
 	-- Used to setup the control point map, function located within cl_hud.lua
-	Initialize_HUD( self )
+	self:Initialize_HUD()
+
+	-- Used to precache the buff icons, function located within cl_buff.lua
+	self:Initialize_Buffs()
 end
 
 function GM:Think()

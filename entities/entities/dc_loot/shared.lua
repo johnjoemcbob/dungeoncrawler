@@ -15,6 +15,10 @@ end
 
 ENT.Type = "anim"
 
+-- Flag for whether or not being near this entity should light the player's way
+ENT.IsLightSource = true
+ENT.LightLevel = 2
+
 -- Table containing the heroes which have already claimed loot from
 -- this source
 ENT.HeroesClaimed = {}
@@ -38,10 +42,11 @@ function ENT:Initialize()
 
 	self.DefaultPos = self:GetPos()
 
+	self:SetSolid( SOLID_NONE )
+
 	if SERVER then
 		-- Remove physics from this game logic entity
 		self:SetMoveType( MOVETYPE_NONE )
-		self:SetSolid( SOLID_NONE )
 	end
 end
 
@@ -58,12 +63,8 @@ end
 
 if CLIENT then
 	function ENT:Draw()
-		local function round( num, idp )
-			return tonumber( string.format( "%." .. ( idp or 0 ) .. "f", num ) )
-		end
-
 		-- Apply some small scaling for visual appeal
-		local oldscale = round( self:GetModelScale(), 3 )
+		local oldscale = math.Round( self:GetModelScale(), 3 )
 		if ( oldscale == self.StartScale ) then
 			-- Reset to the original position after playing the opening animation
 			--self:SetPos( self.DefaultPos )

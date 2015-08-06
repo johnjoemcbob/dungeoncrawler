@@ -3,13 +3,16 @@
 -- Main serverside logic
 
 AddCSLuaFile( "cl_atmosphere.lua" )
+AddCSLuaFile( "cl_buff.lua" )
 AddCSLuaFile( "cl_hud.lua" )
 AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
 AddCSLuaFile( "sh_controlpoints.lua" )
+AddCSLuaFile( "sh_buff.lua" )
 
 include( "shared.lua" )
 include( "sh_controlpoints.lua" )
+include( "sv_buff.lua" )
 
 function GM:Initialize()
 	self.BaseClass:Initialize()
@@ -41,6 +44,9 @@ end
 
 function GM:Think()
 	self.BaseClass:Think()
+
+	-- Used to update buffs on players, function located within sv_buff.lua
+	self:Think_Buff()
 end
 
 function GM:PlayerSwitchFlashlight( ply, on )
@@ -52,6 +58,9 @@ function GM:PlayerInitialSpawn( ply )
 	for k, point in pairs( self.ControlPoints ) do
 		point.Entity:SendClientInformation_Capture( ply )
 	end
+
+	-- Used to initialize the player buff table, function located within sv_buff.lua
+	self:PlayerInitialSpawn_Buff( ply )
 end
 
 function GM:PlayerSpawn( ply )

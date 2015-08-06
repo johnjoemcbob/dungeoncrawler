@@ -4,6 +4,7 @@
 -- Mostly contains changes to fretta base settings
 
 include( "sh_controlpoints.lua" )
+include( "sh_buff.lua" )
 
 GM.Name 	= "Dungeon Crawler"
 GM.Author 	= "\nMatthew Cormack (@johnjoemcbob)\nNichlas Rager (@dasomeone)\nJordan Brown (@DrMelon)"

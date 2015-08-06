@@ -27,7 +27,7 @@ net.Receive( "DC_Client_ControlPoint_Capture", function( len )
 	end
 end )
 
-function Initialize_HUD( self )
+function GM:Initialize_HUD()
 	-- First find the size of the map needed to represent the control points
 	local x = {
 		min = nil,
@@ -85,13 +85,15 @@ function Initialize_HUD( self )
 end
 
 function GM:HUDPaint()
-	HUDPaint_ControlPoint_Overall( self )
+	self:HUDPaint_ControlPoint_Overall( self )
 
-	HUDPaint_ControlPoint_Current()
+	self:HUDPaint_ControlPoint_Current()
+
+	self:HUDPaint_Buffs()
 end
 
 -- Display information about the overall location and state of all control points
-function HUDPaint_ControlPoint_Overall( self )
+function GM:HUDPaint_ControlPoint_Overall( self )
 	-- Calculate the coordinates to display at, depending on the users resolution
 	-- (the control point positions are normalized on initialization)
 	local width = ScrW() / 10
@@ -124,7 +126,7 @@ function HUDPaint_ControlPoint_Overall( self )
 end
 
 -- Display information about the current control point, such as name and capture progress
-function HUDPaint_ControlPoint_Current()
+function GM:HUDPaint_ControlPoint_Current()
 	if ( not LocalPlayer().ControlPoint ) then return end
 
 	-- Display the name of this point

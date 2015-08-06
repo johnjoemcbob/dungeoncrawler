@@ -155,7 +155,7 @@ function SWEP:Think()
 
 	if ( CLIENT ) then
 		if ( not input.IsKeyDown( KEY_Q ) ) then
-			AnimTime = AnimTime + ( AnimDir * 0.005 )
+			AnimTime = AnimTime + ( AnimDir * FrameTime() * 0.3 )
 				if ( AnimTime > 0.5 ) then AnimDir = -1 end
 				if ( AnimTime < 0.12 ) then AnimDir = 1 end
 			vm:SetAnimTime( curtime - AnimTime )

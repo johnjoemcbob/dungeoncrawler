@@ -134,6 +134,7 @@ function PostProcess_DarkOutside()
 	local max = 100
 	local add = 20
 	local lightlevel = 0
+		-- Automatically add extra light if indoors
 		if ( LocalPlayer().Inside ) then
 			lightlevel = max * LightAffectInside
 		end
