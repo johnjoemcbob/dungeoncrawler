@@ -10,6 +10,7 @@ ENT.Type = "anim"
 
 -- Flag for whether or not being near this entity should light the player's way
 ENT.IsLightSource = true
+ENT.LightLevel = 1.5
 
 -- Current scale of the projectile
 ENT.Scale = 0.01
@@ -101,6 +102,25 @@ function ENT:BlowUp()
 		effectdata:SetOrigin( self:GetPos() ) 
 		effectdata:SetScale( math.random( 1,3 ) )
 	util.Effect( "watersplash", effectdata )
+end
+
+if ( CLIENT ) then
+	function ENT:Draw()
+		self:DrawModel()
+
+		-- Light up the totem
+		local dlight = DynamicLight( self:EntIndex() )
+		if ( dlight ) then
+			dlight.pos = self:GetPos() + Vector( 0, 0, 25 )
+			dlight.r = 255
+			dlight.g = 150
+			dlight.b = 200
+			dlight.brightness = 1
+			dlight.Decay = 1000
+			dlight.Size = 128
+			dlight.DieTime = CurTime() + 1
+		end
+	end
 end
 
 function ENT:IsSpell()

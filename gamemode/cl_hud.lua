@@ -17,6 +17,16 @@ net.Receive( "DC_Client_ControlPoint", function( len )
 	}
 end )
 
+-- Initialization of this message is contained within dc_trigger_control/shared.lua
+-- NOTE: Isn't JUST sent after capture, is also used on new players to update them on the
+-- either monstercontrolled/not
+net.Receive( "DC_Client_ControlPoint_Capture", function( len )
+	if ( Minimap.Points ) then
+		local id = math.Round( net.ReadFloat() )
+		Minimap.Points[id].MonsterControlled = net.ReadBit() == 1
+	end
+end )
+
 function Initialize_HUD( self )
 	-- First find the size of the map needed to represent the control points
 	local x = {
@@ -68,7 +78,8 @@ function Initialize_HUD( self )
 			Position = {
 				x = ( v.Position.x + math.abs( x.min ) ) / Minimap.X.dif,
 				y = ( v.Position.y + math.abs( y.min ) ) / Minimap.Y.dif,
-			}
+			},
+			MonsterControlled = true
 		} )
 	end
 end
@@ -81,22 +92,34 @@ end
 
 -- Display information about the overall location and state of all control points
 function HUDPaint_ControlPoint_Overall( self )
-	--draw.DrawText( self.ControlPoints[2].Title, "TargetID", ScrW() * 0.5, ScrH() * 0.1, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER )
+	-- Calculate the coordinates to display at, depending on the users resolution
+	-- (the control point positions are normalized on initialization)
+	local width = ScrW() / 10
+	local height = ScrH() / 10
+	local x = ( ScrW() / 2 ) - ( width / 2 )
+	local y = ( height / 2 )
+	local radius = width / 5
 
+	-- Display the map
 	if ( Minimap.Points ) then
 		for k, v in pairs( Minimap.Points ) do
-			surface.SetDrawColor( 255, 0, 0, 200 )
+			if ( v.MonsterControlled ) then
+				surface.SetDrawColor( 255, 0, 0, 200 )
+			else
+				surface.SetDrawColor( 0, 0, 255, 200 )
+			end
 			draw.NoTexture()
-			draw.Circle( ScrW() * v.Position.x, ScrH() * v.Position.y, 200, math.sin( CurTime() ) * 20 + 25 )
+			draw.Circle( x + ( width * v.Position.x ), y + ( height * v.Position.y ), radius, 25 )
 		end
 
+		-- Player's position in the world
 		local plyx = LocalPlayer():GetPos().x
 		local plyy = LocalPlayer():GetPos().y
 			plyx = ( plyx + math.abs( Minimap.X.min ) ) / Minimap.X.dif
 			plyy = ( plyy + math.abs( Minimap.Y.min ) ) / Minimap.Y.dif
 		surface.SetDrawColor( 50, 50, 255, 200 )
 		draw.NoTexture()
-		draw.Circle( ScrW() * plyx, ScrH() * plyy, 100, math.sin( CurTime() ) * 20 + 25 )
+		draw.Circle( x + ( width * plyx ), y + ( height * plyy ), radius / 2, 5 )
 	end
 end
 
@@ -104,7 +127,9 @@ end
 function HUDPaint_ControlPoint_Current()
 	if ( not LocalPlayer().ControlPoint ) then return end
 
-	draw.DrawText( LocalPlayer().ControlPoint.Name, "TargetID", ScrW() * 0.5, ScrH() * 0.01, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER )
+	-- Display the name of this point
+	local textcolour = Color( 255, 255, 255, 255 )
+	draw.DrawText( LocalPlayer().ControlPoint.Name, "TargetID", ScrW() * 0.5, ScrH() * 0.01, textcolour, TEXT_ALIGN_CENTER )
 
 	-- Skip to the right value if too far out
 	if ( math.abs( LocalPlayer().ControlPoint.Progress - Progress ) > 50 ) then
@@ -118,13 +143,17 @@ function HUDPaint_ControlPoint_Current()
 	end
 
 	-- Progress bar for capturing
+	local progresscolour = Color( 0, 0, 255, 128 )
+		if ( Progress ~= 100 ) then
+			progresscolour = Color( 255, 0, 0, 128 )
+		end
 	local width = 256 / 100 * Progress
 	local height = 28
 	draw.RoundedBox(
 		0,
 		( ScrW() * 0.5 ) - ( width / 2 ), ( ScrH() * 0.01 ) - ( height / 2 ),
 		width, height,
-		Color( 100, 0, 0, 128 )
+		progresscolour
 	)
 end
 

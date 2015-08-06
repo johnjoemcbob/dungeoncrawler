@@ -33,27 +33,12 @@ local ViewModel_Offset_Up = -15
 local ViewModel_Offset_Right = 0
 local ViewModel_Angle_Roll = 0
 
---local ViewModel_Copy
-
 function SWEP:Initialize()
---
 	self:SetWeaponHoldType( "fist" )
---
 end
 
 function SWEP:PreDrawViewModel( vm, wep, ply )
 	vm:SetMaterial( "engine/occlusionproxy" ) -- Hide that view model with hacky material
-
-	--if ( !ViewModel_Copy ) then
-	--
-	--	ViewModel_Copy = ClientsideModel( vm:GetModel() )
-	--
-	--end
-
-	--ViewModel_Copy:SetPos( ply:EyePos() + Vector( 2, 2, 0 ) )
-	--ViewModel_Copy:SetAngles( ply:EyeAngles() + Angle( 0, 0, 20 ) )
-	--ViewModel_Copy:SetColor( Color( 255, 0, 255, 255 ) )
-	--ViewModel_Copy:SetAnimTime( vm:GetAnimTime() )
 end
 
 function SWEP:SetupDataTables()
@@ -82,7 +67,6 @@ local NextCast2 = 0
 function SWEP:SecondaryAttack()
 	if ( SERVER ) then
 		if ( CurTime() > NextCast2 ) then
-			print( "cast" )
 			local spell = ents.Create( self.Owner.Spells[2] )
 			spell:Spawn()
 			spell:Cast( self.Owner )

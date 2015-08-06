@@ -68,6 +68,21 @@ function ENT:Cast_TrapTotem_Create( ply, trace )
 	return spell
 end
 
+-- Base function used as part of any spells which create world traps to hurt heroes,
+-- or totems to buff heroes/debuff monsters
+-- Used to rotate traps/totems depending on the hit normal of the surface cast on
+function ENT:Cast_TrapTotem_Rotate( spell, trace )
+	-- Rotate the totem based on the trace hit normal
+	local angle = trace.HitNormal:Angle()
+	-- If the totem has been placed on a near vertical wall
+	if (
+		( math.abs( math.AngleDifference( angle.p, 0 ) ) <= 20 ) and
+		( math.abs( math.AngleDifference( angle.r, 0 ) ) <= 20 )
+	) then
+		spell:SetAngles( ( ( -angle:Forward() * 10 ) + ( angle:Up() * 2 ) ):Angle() )
+	end
+end
+
 -- Base function for any spells which fire a projectile
 function ENT:Cast_Projectile( ply )
 	local spell, angle = self:Cast_Projectile_Create( ply, ply:GetPos() + Vector( 0, 0, 50 ) )

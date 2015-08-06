@@ -18,6 +18,9 @@ ENT.Type = "anim"
 ENT.StartPos = Vector( 0, 0, 0 )
 ENT.EndPos = Vector( 1, 1, 1 )
 
+-- The id of this trigger zone in the table
+ENT.ID = 0
+
 -- The name of this trigger zone
 ENT.ZoneName = "Control Point"
 
@@ -72,8 +75,9 @@ end
 -- NET message initialization and send logic
 if SERVER then
 	util.AddNetworkString( "DC_Client_ControlPoint" )
+	util.AddNetworkString( "DC_Client_ControlPoint_Capture" )
 
-	-- NOTE: ply can be a single player or a table of players
+	-- NOTE: ply can be a single player or a table of players (?)
 	function ENT:SendClientInformation_Inside( ply )
 		-- Send the relevant information about this control point to any players within it
 		net.Start( "DC_Client_ControlPoint" )
@@ -83,13 +87,22 @@ if SERVER then
 		net.Send( ply )
 	end
 
-	-- NOTE: ply can be a single player or a table of players
+	-- NOTE: ply can be a single player or a table of players (?)
 	function ENT:SendClientInformation_Outside( ply )
 		-- Send the null information to blank the player's HUD of the point they just exited
 		net.Start( "DC_Client_ControlPoint" )
 			net.WriteString( "" )
 			net.WriteFloat( 0 )
 			net.WriteFloat( 0 )
+		net.Send( ply )
+	end
+
+	-- NOTE: ply can be a single player or a table of players (?)
+	function ENT:SendClientInformation_Capture( ply )
+		-- Send the null information to blank the player's HUD of the point they just exited
+		net.Start( "DC_Client_ControlPoint_Capture" )
+			net.WriteFloat( self.ID )
+			net.WriteBit( self.MonsterControlled )
 		net.Send( ply )
 	end
 end
@@ -120,14 +133,12 @@ if SERVER then
 
 		-- Add player to this zone
 		self.PlayersContained[ply:EntIndex()] = ply
-		PrintTable( self.PlayersContained )
 
 		-- Store this zone on the player for clientside visuals
 		ply.TriggerZone = self
 
 		-- Check for capture ability against the changed number of contained players
 		self:CompairTeamNumbers()
-		print( "enter "..self.ZoneName )
 
 		-- Send first information about this point to the new player
 		self:SendClientInformation_Inside( ply )
@@ -135,7 +146,6 @@ if SERVER then
 
 	function ENT:RemovePlayer( ply )
 		self.PlayersContained[ply:EntIndex()] = nil
-		PrintTable( self.PlayersContained )
 
 		-- Remove this zone from the player for clientside visuals
 		if ( ply.TriggerZone == self ) then
@@ -145,7 +155,6 @@ if SERVER then
 
 		-- Check for capture ability against the changed number of contained players
 		self:CompairTeamNumbers()
-		print( "exit "..self.ZoneName )
 	end
 
 	-- Function to compare the number of heroes and monsters inside the zone,
@@ -187,18 +196,21 @@ if SERVER then
 			-- Heroes are capturing
 			if ( self.TeamCapturing == TEAM_HERO ) then
 				self.CaptureProgress = self.CaptureProgress + ( FrameTime() * self.CaptureSpeed )
-				print( self.CaptureProgress )
 
 				-- Flag that the heroes have won this point
 				if ( self.CaptureProgress >= 100 ) then
 					self.CaptureProgress = 100
 					self.MonsterControlled = false
 					self.TeamCapturing = false
-					print( "capd "..self.ZoneName )
 
 					-- Add score to any players inside at this point
 					for k, ply in pairs( self.PlayersContained ) do
 						ply:AddFrags( self.CaptureScore )
+					end
+
+					-- Send captured state to every player
+					for k, ply in pairs( player.GetAll() ) do
+						self:SendClientInformation_Capture( ply )
 					end
 				end
 
@@ -212,13 +224,11 @@ if SERVER then
 				-- NOTE: Monsters can only revert before the heroes capture 100%
 				if ( self.TeamCapturing == TEAM_MONSTER ) then
 					self.CaptureProgress = self.CaptureProgress - ( FrameTime() * self.RevertSpeedMonster )
-					print( self.CaptureProgress )
 				end
 				-- Time is erasing hero capture progress
 				-- NOTE: Time can only revert before the heroes capture 100%
 				if ( self.TeamCapturing == TEAM_NONE ) then
 					self.CaptureProgress = self.CaptureProgress - ( FrameTime() * self.RevertSpeed )
-					print( self.CaptureProgress )
 				end
 
 				-- Send every frame progress is changed

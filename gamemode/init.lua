@@ -24,6 +24,7 @@ function GM:InitPostEntity()
 			v.Entity:SetPos( v.Position )
 			v.Entity.StartPos = v.Start
 			v.Entity.EndPos = v.End
+			v.Entity.ID = k
 			v.Entity.ZoneName = v.Title
 			v.Entity.Type = v.Type
 			v.Entity.CaptureSpeed = v.CaptureSpeed
@@ -46,6 +47,13 @@ function GM:PlayerSwitchFlashlight( ply, on )
 	return not on
 end
 
+function GM:PlayerInitialSpawn( ply )
+	-- Send captured state of every control point to the new player
+	for k, point in pairs( self.ControlPoints ) do
+		point.Entity:SendClientInformation_Capture( ply )
+	end
+end
+
 function GM:PlayerSpawn( ply )
 	-- Temp
 	if ( ply:Team() == TEAM_HERO ) then
@@ -54,7 +62,7 @@ function GM:PlayerSpawn( ply )
 
 		ply.Spells = {
 			"dc_spell_projectile_fireball",
-			"dc_spell_base"
+			"dc_spell_totem_light"
 		}
 	else
 		ply:SetModel( player_manager.TranslatePlayerModel( "corpse" ) )
