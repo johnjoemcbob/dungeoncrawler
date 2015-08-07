@@ -9,6 +9,12 @@
 -- The range of this spell
 ENT.Range = 500
 
+-- The radius of any touch/area of affect spells
+ENT.Radius = 50
+
+-- The damage to inflict if this spell affects a player
+ENT.Damage = 50
+
 if SERVER then
 	AddCSLuaFile( "shared.lua" )
 end
@@ -53,6 +59,9 @@ function ENT:Cast_TrapTotem( ply )
 		local spell = self:Cast_TrapTotem_Create( ply, tr )
 		spell.Owner = ply
 	end
+
+	-- Remove the spell
+	self:Remove()
 end
 
 -- Base function used as part of any spells which create world traps to hurt heroes,
@@ -98,6 +107,9 @@ function ENT:Cast_Projectile( ply )
 	if ( physics and IsValid( physics ) ) then
 		physics:AddVelocity( forward * spell.Speed )
 	end
+
+	-- Remove the spell
+	self:Remove()
 end
 
 -- Base function used as part of any spells which fire a projectile
@@ -113,4 +125,29 @@ function ENT:Cast_Projectile_Create( ply, start )
 		spell.Owner = ply
 		spell:Spawn()
 	return spell, offsetangle
+end
+
+-- Base function for any spells which fire a projectile
+function ENT:Cast_Touch( ply )
+	-- Project forward out of the player a little
+	local forward = ply:EyeAngles():Forward() * self.Range
+	local entsinrange = ents.FindInSphere( ply:GetPos() + forward, self.Radius )
+	for k, v in pairs( entsinrange ) do
+		-- Is another player
+		-- NOTE: Team checking logic is done on a spell by spell basic, to allow for touch buffs for allies, and touch damages for enemies
+		if ( ( v:IsPlayer() ) and ( v ~= ply ) ) then
+			self:Cast_Touch_Affect( ply, v )
+		end
+	end
+
+	-- Remove the spell
+	self:Remove()
+end
+
+-- Base function used as part of any spells which act only at close range to the target
+-- NOTE: Intended to be overwritten by child spells, to add extra functionality
+function ENT:Cast_Touch_Affect( ply, target )
+	if ( ply:Team() ~= target:Team() ) then
+		target:TakeDamage( self.Damage, ply, self )
+	end
 end

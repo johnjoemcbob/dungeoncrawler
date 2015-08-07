@@ -34,7 +34,7 @@ table.insert(
 			local tr = util.TraceLine(
 				{
 					start = ply:GetPos() + Vector( 0, 0, 1 ) * 20,
-					endpos = ply:GetPos() + Vector( 0, 0, 1 ) * 300,
+					endpos = ply:GetPos() + Vector( 0, 0, 1 ) * 400,
 					mask = MASK_SOLID_BRUSHONLY
 				}
 			)

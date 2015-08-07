@@ -9,6 +9,9 @@ AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
 AddCSLuaFile( "sh_controlpoints.lua" )
 AddCSLuaFile( "sh_buff.lua" )
+AddCSLuaFile( "class/hero.lua" )
+AddCSLuaFile( "class/monster_undead.lua" )
+AddCSLuaFile( "class/monster_shaman.lua" )
 
 include( "shared.lua" )
 include( "sh_controlpoints.lua" )
@@ -54,6 +57,8 @@ function GM:PlayerSwitchFlashlight( ply, on )
 end
 
 function GM:PlayerInitialSpawn( ply )
+	self.BaseClass:PlayerInitialSpawn( ply )
+
 	-- Send captured state of every control point to the new player
 	for k, point in pairs( self.ControlPoints ) do
 		point.Entity:SendClientInformation_Capture( ply )
@@ -64,18 +69,7 @@ function GM:PlayerInitialSpawn( ply )
 end
 
 function GM:PlayerSpawn( ply )
-	-- Temp
-	if ( ply:Team() == TEAM_HERO ) then
-		ply:SetModel( player_manager.TranslatePlayerModel( "male11" ) )
-		ply:Give( "dc_magichand" )
-
-		ply.Spells = {
-			"dc_spell_projectile_fireball",
-			"dc_spell_totem_light"
-		}
-	else
-		ply:SetModel( player_manager.TranslatePlayerModel( "corpse" ) )
-	end
+	self.BaseClass:PlayerSpawn( ply )
 end
 
 function GM:PostPlayerDeath( ply )
@@ -86,6 +80,8 @@ function GM:PostPlayerDeath( ply )
 end
 
 function GM:PlayerDisconnected( ply )
+	self.BaseClass:PlayerDisconnected( ply )
+
 	-- Remove this player from any trigger zones they were in
 	if ( ply.TriggerZone and IsValid( ply.TriggerZone ) ) then
 		ply.TriggerZone:RemovePlayer( ply )
@@ -103,6 +99,21 @@ function GM:ShouldCollide( ent1, ent2 )
 		end
 	end
 	return true
+end
+
+function GM:GetFallDamage( ply, flFallSpeed )
+	-- This can be used to flag never to inflict fall damage on a player or to make them invulnerable a specified number of times
+	if ( ply.NoFallDamage == -1 ) then return end
+	if ( ply.NoFallDamage and ( ply.NoFallDamage > 0 ) ) then
+		ply.NoFallDamage = ply.NoFallDamage - 1
+		return
+	end
+
+	if ( self.RealisticFallDamage ) then
+		return flFallSpeed / 8
+	end
+
+	return 10
 end
 
 hook.Add( "PlayerSpawn", "DC_PlayerSpawn_HandsSetup", function( ply )

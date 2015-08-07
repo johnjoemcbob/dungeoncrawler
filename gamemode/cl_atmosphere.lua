@@ -51,7 +51,7 @@ function AtmosphereThink()
 	local tr = util.TraceLine(
 		{
 			start = LocalPlayer():EyePos() + Vector( 0, 0, 1 ) * 20,
-			endpos = LocalPlayer():EyePos() + Vector( 0, 0, 1 ) * 300,
+			endpos = LocalPlayer():EyePos() + Vector( 0, 0, 1 ) * 400,
 		}
 	)
 	LocalPlayer().Inside = tr.Hit

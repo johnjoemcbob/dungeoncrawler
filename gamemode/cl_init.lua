@@ -3,8 +3,6 @@
 -- Main clientside logic
 
 include( "shared.lua" )
-include( "sh_controlpoints.lua" )
-include( "sh_buff.lua" )
 include( "cl_atmosphere.lua" )
 include( "cl_hud.lua" )
 include( "cl_buff.lua" )

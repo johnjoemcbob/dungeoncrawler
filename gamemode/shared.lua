@@ -3,6 +3,11 @@
 -- Main shared info/logic
 -- Mostly contains changes to fretta base settings
 
+DeriveGamemode( "fretta13" )
+
+include( "class/hero.lua" )
+include( "class/monster_undead.lua" )
+include( "class/monster_shaman.lua" )
 include( "sh_controlpoints.lua" )
 include( "sh_buff.lua" )
 
@@ -49,7 +54,8 @@ GM.RoundEndsWhenOneTeamAlive = true	-- CS Style rules
 GM.EnableFreezeCam = false			-- TF2 Style Freezecam
 GM.DeathLingerTime = 0				-- The time between you dying and it going into spectator mode, 0 disables
 
-GM.SelectModel = true               -- Can players use the playermodel picker in the F1 menu?
+GM.SelectClass = true               -- Can players select their class?
+GM.SelectModel = false               -- Can players use the playermodel picker in the F1 menu?
 GM.SelectColor = false				-- Can players modify the colour of their name? (ie.. no teams)
 
 GM.PlayerRingSize = 48              -- How big are the colored rings under the player's feet (if they are enabled) ?
@@ -62,30 +68,23 @@ GM.ValidSpectatorModes = { OBS_MODE_CHASE, OBS_MODE_IN_EYE, OBS_MODE_ROAMING } -
 GM.ValidSpectatorEntities = { "player" }	-- Entities we can spectate, players being the obvious default choice.
 GM.CanOnlySpectateOwnTeam = true; -- you can only spectate players on your own team
 
-DeriveGamemode( "fretta13" )
-
 TEAM_NONE		= 0
 TEAM_HERO 		= 1
 TEAM_MONSTER 	= 2
 TEAM_BOTH		= 3
 
---[[
-   Name: gamemode:CreateTeams()
-   Desc: Set up all your teams here. Note - HAS to be shared.
-]]
-
 function GM:CreateTeams()
-
 	if ( !GAMEMODE.TeamBased ) then return end
 
 	team.SetUp( TEAM_HERO, "Heroes", Color( 80, 150, 255 ) )
 	team.SetSpawnPoint( TEAM_HERO, "info_player_start", true )
+	team.SetClass( TEAM_HERO, { "class_hero" } )
 	
 	team.SetUp( TEAM_MONSTER, "Monsters", Color( 255, 80, 80 ) )
 	team.SetSpawnPoint( TEAM_MONSTER, "info_player_start", true )
+	team.SetClass( TEAM_MONSTER, { "class_monster_undead", "class_monster_shaman" } )
 	
 	team.SetUp( TEAM_SPECTATOR, "Spectators", Color( 200, 200, 200 ), true )
 	team.SetSpawnPoint( TEAM_SPECTATOR, "info_player_start" )
 	team.SetClass( TEAM_SPECTATOR, { "Spectator" } )
-
 end

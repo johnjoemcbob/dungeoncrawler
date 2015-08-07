@@ -14,7 +14,7 @@ ENT.LightLevel = 1
 
 -- The time this totem should last
 -- NOTE: After creation CurTime() is added this to make it the end time
-ENT.Time = 60
+ENT.Time = 300
 
 function ENT:Initialize()
 	-- Initialize shared totem properties
