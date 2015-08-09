@@ -84,6 +84,18 @@ function GM:Initialize_HUD()
 	end
 end
 
+function GM:ContextMenuOpen()
+	return true
+end
+
+function GM:OnContextMenuOpen()
+	gui.EnableScreenClicker( true )
+end
+
+function GM:OnContextMenuClose()
+	gui.EnableScreenClicker( false )
+end
+
 function GM:HUDPaint()
 	self:HUDPaint_ControlPoint_Overall( self )
 

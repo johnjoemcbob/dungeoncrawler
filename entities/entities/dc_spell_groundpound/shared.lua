@@ -6,7 +6,7 @@
 ENT.Range = 50
 
 -- The radius of any touch/area of affect spells
-ENT.Radius = 50
+ENT.Radius = 350
 
 -- The damage to inflict if this spell affects a player
 ENT.Damage = 50
@@ -34,7 +34,7 @@ function ENT:Think()
 			-- Cause damage to surrounding players
 			local extra = math.Clamp( self.StartZ - self.Owner:GetPos().z, -self.ExtraHeight, self.ExtraHeight ) / self.ExtraHeight
 			local damage = self.Damage + ( extra * ( self.Damage / self.ExtraDamage ) )
-			print( extra )
+
 			local entsinrange = ents.FindInSphere( self.Owner:GetPos(), self.Radius )
 			for k, v in pairs( entsinrange ) do
 				-- Is another player, on another team

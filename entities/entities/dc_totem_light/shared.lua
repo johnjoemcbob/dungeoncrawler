@@ -50,13 +50,13 @@ if ( CLIENT ) then
 		-- Light up the totem
 		local dlight = DynamicLight( self:EntIndex() )
 		if ( dlight ) then
-			dlight.pos = self:GetPos() + Vector( 0, 0, 25 )
+			dlight.pos = self:GetPos() + Vector( 0, 0, 35 )
 			dlight.r = 255
-			dlight.g = 150
-			dlight.b = 200
-			dlight.brightness = 1
-			dlight.Decay = 1000
-			dlight.Size = 128
+			dlight.g = 69
+			dlight.b = 0
+			dlight.Brightness = 1
+			dlight.Decay = 500
+			dlight.Size = 256
 			dlight.DieTime = CurTime() + 1
 		end
 	end

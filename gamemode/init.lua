@@ -70,6 +70,10 @@ end
 
 function GM:PlayerSpawn( ply )
 	self.BaseClass:PlayerSpawn( ply )
+
+	for k, buff in pairs( self.Buffs ) do
+		ply:RemoveBuff( k )
+	end
 end
 
 function GM:PostPlayerDeath( ply )

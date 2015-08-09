@@ -1,12 +1,9 @@
 -- Matthew Cormack (@johnjoemcbob)
--- 05/08/15
--- Basic fireball projectile spell
+-- 08/08/15
+-- Poison projectile spell, inflicts base damage on hit and applies poison debuff
 
 -- The range of this spell
 ENT.Range = 500
-
--- The cooldown of this spell
-ENT.Cooldown = 0.1
 
 if SERVER then
 	AddCSLuaFile( "shared.lua" )
@@ -30,7 +27,7 @@ function ENT:Cast_Projectile_Create( ply, start )
 	-- Offset angle can be used to fire projectiles in directions other than straight
 	local offsetangle = Angle( 0, 0, 0 )
 
-	local spell = ents.Create( "dc_projectile_fireball" )
+	local spell = ents.Create( "dc_projectile_poison" )
 		spell:SetPos( start )
 		spell.Owner = ply
 		spell:Spawn()

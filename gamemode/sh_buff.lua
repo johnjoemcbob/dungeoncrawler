@@ -7,6 +7,8 @@
 	-- Description = "Under shelter, protected from the elements.", -- Description for the tooltip
 	-- Icon = "icon16/house.png", -- Icon to display as the buff's main visuals
 	-- Time = 0, -- Times here are in seconds; NOTE - exactly 0.5 flags the client to display a quickly recurring buff (e.g. shelter)
+	-- Team = TEAM_BOTH, -- Which team this buff/debuff should affect (TEAM_MONSTER,TEAM_HERO,TEAM_BOTH)
+	-- Debuff = false, -- Whether or not this buff should be displayed as a negative buff (debuff)
 	-- ThinkActivate = function( self, ply ) -- Run every frame to run logic on adding the buff to the player under certain conditions
 		-- return true/false -- Whether or not the buff should be activated
 	-- end,
@@ -20,6 +22,9 @@
 		
 	-- end
 -- }
+--
+-- If you want to continue using silk icons, a full list can be found in this image;
+-- http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png
 
 GM.Buffs = {}
 
@@ -27,9 +32,11 @@ table.insert(
 	GM.Buffs,
 	{
 		Name = "Sheltered",
-		Description = "Under shelter, protected from the elements.",
+		Description = "Under shelter, protected\nfrom the elements.",
 		Icon = "icon16/house.png",
 		Time = 0.5, -- Must constantly be re-added by ThinkActivate
+		Team = TEAM_HERO,
+		Debuff = false,
 		ThinkActivate = function( self, ply )
 			local tr = util.TraceLine(
 				{
@@ -44,13 +51,13 @@ table.insert(
 			return false
 		end,
 		Init = function( self, ply )
-			print( "inside" )
+			
 		end,
 		Think = function( self, ply )
 			
 		end,
 		Remove = function( self, ply )
-			print( "outside" )
+			
 		end
 	}
 )
@@ -58,9 +65,11 @@ table.insert(
 	GM.Buffs,
 	{
 		Name = "Soaked",
-		Description = "Covered in water, cold and slower.",
+		Description = "Covered in water,\ncold and slower.",
 		Icon = "icon16/weather_rain.png",
 		Time = 30,
+		Team = TEAM_HERO,
+		Debuff = true,
 		ThinkActivate = function( self, ply )
 			if ( ply:WaterLevel() > 0 ) then
 				return true
@@ -68,13 +77,93 @@ table.insert(
 			return false
 		end,
 		Init = function( self, ply )
-			print( "wet" )
+			ply:SetWalkSpeed( ply:GetWalkSpeed() / 2 )
+			ply:SetRunSpeed( ply:GetRunSpeed() / 2 )
 		end,
 		Think = function( self, ply )
 			
 		end,
 		Remove = function( self, ply )
-			print( "dry" )
+			ply:SetWalkSpeed( ply:GetWalkSpeed() * 2 )
+			ply:SetRunSpeed( ply:GetRunSpeed() * 2 )
+		end
+	}
+)
+table.insert(
+	GM.Buffs,
+	{
+		Name = "Poisoned",
+		Description = "Suffering poison damage.",
+		Icon = "icon16/bug.png",
+		Time = 5,
+		Team = TEAM_BOTH,
+		Debuff = true,
+		ThinkActivate = function( self, ply )
+			-- This is mostly activated by spells hitting the player
+		end,
+		Init = function( self, ply )
+			
+		end,
+		Think = function( self, ply )
+			if ( ( not ply.NextPoison ) or ( CurTime() > ply.NextPoison ) ) then
+				ply:TakeDamage( 1, ply, ply )
+				ply.NextPoison = CurTime() + 0.5
+			end
+		end,
+		Remove = function( self, ply )
+			
+		end
+	}
+)
+table.insert(
+	GM.Buffs,
+	{
+		Name = "Regeneration",
+		Description = "Health is slowly\nregenerating.",
+		Icon = "icon16/heart.png",
+		Time = 1,
+		Team = TEAM_BOTH,
+		Debuff = false,
+		ThinkActivate = function( self, ply )
+			-- This is mostly activated by totems affecting the player
+		end,
+		Init = function( self, ply )
+			
+		end,
+		Think = function( self, ply )
+			if ( ( not ply.NextRegen ) or ( CurTime() > ply.NextRegen ) ) then
+				ply:SetHealth( math.Clamp( ply:Health() + 1, 0, ply:GetMaxHealth() ) )
+				ply.NextRegen = CurTime() + 0.5
+			end
+		end,
+		Remove = function( self, ply )
+			
+		end
+	}
+)
+table.insert(
+	GM.Buffs,
+	{
+		Name = "Fire",
+		Description = "You are on fire,\nit hurts.",
+		Icon = "icon16/fire.png",
+		Time = 2.5,
+		Team = TEAM_BOTH,
+		Debuff = true,
+		ThinkActivate = function( self, ply )
+			-- This is mostly activated by totems affecting the player
+		end,
+		Init = function( self, ply )
+			
+		end,
+		Think = function( self, ply )
+			if ( ( not ply.NextBurn ) or ( CurTime() > ply.NextBurn ) ) then
+				ply:TakeDamage( 1, ply, ply )
+				ply.NextBurn = CurTime() + 0.2
+			end
+		end,
+		Remove = function( self, ply )
+			
 		end
 	}
 )

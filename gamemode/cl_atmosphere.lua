@@ -14,26 +14,30 @@ local LightAffectInside = 3 / 4
 
 -- The speed at which to approach new atmospheric fog/light values
 local AtmosphereApproachSpeed = 100
- 
+local AtmosphereLightApproachSpeed = 0.1
+
 -- Fog max distance
 local FogStart_Default = 500
 
 -- Fog min distance
-local FogStart_Dark = 200
+local FogStart_Dark = 300
 
 -- The runtime fog distance value
 local FogTarget = FogStart_Default
 local FogStart = FogStart_Default
 
 -- Post processing light defaults
-local ps_default_brightness = -0.16
+local ps_default_brightness = -0.10
 local ps_default_contrast = 1
 local ps_default_colour = 0.85
 
 -- Post processing dark defaults
-local ps_dark_brightness = -0.24
+local ps_dark_brightness = -0.22
 local ps_dark_contrast = 1
 local ps_dark_colour = 0.7
+
+-- Post processing monster defaults
+local ps_monster_colour = 0.1
 
 -- Post processing runtime values
 local DC_PS_Brightness = ps_default_brightness
@@ -134,8 +138,8 @@ function PostProcess_DarkOutside()
 	local max = 100
 	local add = 20
 	local lightlevel = 0
-		-- Automatically add extra light if indoors
-		if ( LocalPlayer().Inside ) then
+		-- Automatically add extra light if indoors or if the player is a monster
+		if ( LocalPlayer().Inside or ( LocalPlayer():Team() == TEAM_MONSTER ) ) then
 			lightlevel = max * LightAffectInside
 		end
 	for k, v in pairs( ents.FindInSphere( LocalPlayer():GetPos(), LightAffectRadius ) ) do
@@ -148,21 +152,25 @@ function PostProcess_DarkOutside()
 	DC_PS_Brightness_Target = ps_dark_brightness + ( ( ps_default_brightness - ps_dark_brightness ) / max * lightlevel )
 	DC_PS_Contrast_Target = ps_dark_contrast + ( ( ps_default_contrast - ps_dark_contrast ) / max * lightlevel )
 	DC_PS_Colour_Target = ps_dark_colour + ( ( ps_default_colour - ps_dark_colour ) / max * lightlevel )
+		-- Monsters have a separate colour value
+		if ( LocalPlayer():Team() == TEAM_MONSTER ) then
+			DC_PS_Colour_Target = ps_monster_colour
+		end
 
 	-- Lerp these post processing values
-	local speed = AtmosphereApproachSpeed
+	local speed = AtmosphereLightApproachSpeed
 		if ( DC_PS_Brightness_Target < DC_PS_Brightness ) then
 			speed = -speed
 		end
 	DC_PS_Brightness = math.Approach( DC_PS_Brightness, DC_PS_Brightness_Target, FrameTime() * speed )
 
-	local speed = AtmosphereApproachSpeed
+	local speed = AtmosphereLightApproachSpeed
 		if ( DC_PS_Contrast_Target < DC_PS_Contrast ) then
 			speed = -speed
 		end
 	DC_PS_Contrast = math.Approach( DC_PS_Contrast, DC_PS_Contrast_Target, FrameTime() * speed )
 
-	local speed = AtmosphereApproachSpeed
+	local speed = AtmosphereLightApproachSpeed
 		if ( DC_PS_Colour_Target < DC_PS_Colour ) then
 			speed = -speed
 		end

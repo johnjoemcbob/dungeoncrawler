@@ -5,6 +5,11 @@
 
 DeriveGamemode( "fretta13" )
 
+TEAM_NONE		= 0
+TEAM_HERO 		= 1
+TEAM_MONSTER 	= 2
+TEAM_BOTH		= 3
+
 include( "class/hero.lua" )
 include( "class/monster_undead.lua" )
 include( "class/monster_shaman.lua" )
@@ -67,11 +72,6 @@ GM.DeathNoticeTextColor = color_white; -- colour for text ie. "died", "killed"
 GM.ValidSpectatorModes = { OBS_MODE_CHASE, OBS_MODE_IN_EYE, OBS_MODE_ROAMING } -- The spectator modes that are allowed
 GM.ValidSpectatorEntities = { "player" }	-- Entities we can spectate, players being the obvious default choice.
 GM.CanOnlySpectateOwnTeam = true; -- you can only spectate players on your own team
-
-TEAM_NONE		= 0
-TEAM_HERO 		= 1
-TEAM_MONSTER 	= 2
-TEAM_BOTH		= 3
 
 function GM:CreateTeams()
 	if ( !GAMEMODE.TeamBased ) then return end

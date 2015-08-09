@@ -15,6 +15,9 @@ ENT.Radius = 50
 -- The damage to inflict if this spell affects a player
 ENT.Damage = 50
 
+-- The cooldown of this spell
+ENT.Cooldown = 1
+
 if SERVER then
 	AddCSLuaFile( "shared.lua" )
 end
@@ -88,14 +91,13 @@ function ENT:Cast_TrapTotem_Rotate( spell, trace )
 		( math.abs( math.AngleDifference( angle.p, 0 ) ) <= 20 ) and
 		( math.abs( math.AngleDifference( angle.r, 0 ) ) <= 20 )
 	) then
-		spell:SetAngles( ( ( -angle:Forward() * 10 ) + ( angle:Up() * 2 ) ):Angle() )
+		spell:SetAngles( spell:GetAngles() + ( ( -angle:Forward() * 10 ) + ( angle:Up() * 2 ) ):Angle() )
 	end
 end
 
 -- Base function for any spells which fire a projectile
 function ENT:Cast_Projectile( ply )
 	local spell, angle = self:Cast_Projectile_Create( ply, ply:GetPos() + Vector( 0, 0, 50 ) )
-	spell.Range = self.Range
 	spell.Owner = ply
 
 	-- Project forward out of the player a little

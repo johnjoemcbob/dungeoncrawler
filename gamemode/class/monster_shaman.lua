@@ -11,7 +11,7 @@ local CLASS = {}
 	CLASS.DuckSpeed				= 0.2
 	CLASS.JumpPower				= 200
 	CLASS.PlayerModel			= player_manager.TranslatePlayerModel( "monk" )
-	CLASS.DrawTeamRing			= true
+	CLASS.DrawTeamRing			= false
 	CLASS.DrawViewModel			= false
 	CLASS.CanUseFlashlight      = false
 	CLASS.MaxHealth				= 100
@@ -28,8 +28,8 @@ function CLASS:Loadout( ply )
 	ply:Give( "dc_magichand" )
 
 	ply.Spells = {
-		"dc_spell_projectile_fireball",
-		"dc_spell_totem_light"
+		"dc_spell_projectile_poison",
+		"dc_spell_totem_shaman"
 	}
 end
 

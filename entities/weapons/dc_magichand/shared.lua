@@ -20,11 +20,13 @@ SWEP.Primary.ClipSize		= -1
 SWEP.Primary.DefaultClip	= -1
 SWEP.Primary.Automatic		= true
 SWEP.Primary.Ammo			= "none"
+SWEP.Primary.NextCast = 0
 
 SWEP.Secondary.ClipSize		= -1
 SWEP.Secondary.DefaultClip	= -1
 SWEP.Secondary.Automatic	= true
 SWEP.Secondary.Ammo			= "none"
+SWEP.Secondary.NextCast = 0
 
 local AnimTime = 0
 local AnimDir = 1
@@ -50,28 +52,28 @@ function SWEP:UpdateNextIdle()
 	self:SetNextIdle( CurTime() + vm:SequenceDuration() )
 end
 
-local NextCast1= 0
 function SWEP:PrimaryAttack( right )
 	if ( SERVER ) then
-		if ( CurTime() > NextCast1 ) then
+		if ( CurTime() > self.Primary.NextCast ) then
 			local spell = ents.Create( self.Owner.Spells[1] )
+			spell.Owner = self.Owner
 			spell:Spawn()
 			spell:Cast( self.Owner )
 
-			NextCast1 = CurTime() + 0.5
+			self.Primary.NextCast = CurTime() + spell.Cooldown
 		end
 	end
 end
 
-local NextCast2 = 0
 function SWEP:SecondaryAttack()
 	if ( SERVER ) then
-		if ( CurTime() > NextCast2 ) then
+		if ( CurTime() > self.Secondary.NextCast ) then
 			local spell = ents.Create( self.Owner.Spells[2] )
+			spell.Owner = self.Owner
 			spell:Spawn()
 			spell:Cast( self.Owner )
 
-			NextCast2 = CurTime() + 0.5
+			self.Secondary.NextCast = CurTime() + spell.Cooldown
 		end
 	end
 end

@@ -51,7 +51,7 @@ function GM:Think_Buff()
 		-- Run logic on every player and every buff to find if the buff should be added to that player
 		for m, buff in pairs( self.Buffs ) do
 			local add = buff:ThinkActivate( ply )
-			if ( add ) then
+			if ( add and ( ( buff.Team == TEAM_BOTH ) or ( buff.Team == ply:Team() ) ) ) then
 				-- If the buff doesn't exist currently on the player, initialize it
 				if ( not ply:GetBuff( m ) ) then
 					buff:Init( ply )
