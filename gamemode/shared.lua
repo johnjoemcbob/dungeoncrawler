@@ -14,6 +14,7 @@ include( "class/hero.lua" )
 include( "class/monster_undead.lua" )
 include( "class/monster_shaman.lua" )
 include( "sh_controlpoints.lua" )
+include( "sh_altar_spawns.lua" )
 include( "sh_buff.lua" )
 
 GM.Name 	= "Dungeon Crawler"

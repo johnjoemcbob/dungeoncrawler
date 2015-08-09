@@ -36,7 +36,7 @@ function ENT:Initialize()
 	self:SetModel( "models/props_combine/breendesk.mdl" )
 	self:SetSolid( SOLID_VPHYSICS )
 	self.DefaultPos = self:GetPos()
-	self:SetAngles( Angle(0, 180, 0) )
+
 	
 	if SERVER then
 		-- Spawn the altar's decorations
@@ -51,7 +51,7 @@ function ENT:Initialize()
 		-- Skull
 		self.Skull = ents.Create( "prop_dynamic" )
 		self.Skull:SetModel( "models/Gibs/HGIBS.mdl" )
-		self.Skull:SetAngles( Angle( 0, 180, 0 ) )
+		self.Skull:SetAngles( Angle( 0, 0, 0 ) )
 		self.Skull:SetPos( self.SkullHolder:GetPos() + ( self.SkullHolder:GetAngles():Up() * 15 ) )
 		self.Skull:SetParent( self.SkullHolder )
 		
@@ -59,14 +59,14 @@ function ENT:Initialize()
 		self.SkullHornL = ents.Create( "prop_dynamic" )
 		self.SkullHornL:SetModel( "models/Gibs/HGIBS_spine.mdl" )
 		self.SkullHornL:SetAngles( Angle( 0, 0, -30) )
-		self.SkullHornL:SetPos( self.Skull:GetPos() + ( self.Skull:GetAngles():Up() * 5 ) + ( self.Skull:GetAngles():Right() * 5 ) )
+		self.SkullHornL:SetPos( self.Skull:GetPos() + ( self.Skull:GetAngles():Up() * 5 ) + ( self.Skull:GetAngles():Right() * -5 ) )
 		self.SkullHornL:SetParent( self.SkullHolder )	
 		
 		-- Skull Horn (Right)
 		self.SkullHornR = ents.Create( "prop_dynamic" )
 		self.SkullHornR:SetModel( "models/Gibs/HGIBS_spine.mdl" )
-		self.SkullHornR:SetAngles( Angle( 0, 180,-30) )
-		self.SkullHornR:SetPos( self.Skull:GetPos() + ( self.Skull:GetAngles():Up() * 5 ) + ( self.Skull:GetAngles():Right() * -5 ) )
+		self.SkullHornR:SetAngles( Angle( 0, 180, -30) )
+		self.SkullHornR:SetPos( self.Skull:GetPos() + ( self.Skull:GetAngles():Up() * 5 ) + ( self.Skull:GetAngles():Right() * 5 ) )
 		self.SkullHornR:SetParent( self.SkullHolder )	
 		
 		-- Decorative Tablet

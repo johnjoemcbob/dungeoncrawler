@@ -8,13 +8,13 @@ AddCSLuaFile( "cl_hud.lua" )
 AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
 AddCSLuaFile( "sh_controlpoints.lua" )
+AddCSLuaFile( "sh_altar_spawns.lua" )
 AddCSLuaFile( "sh_buff.lua" )
 AddCSLuaFile( "class/hero.lua" )
 AddCSLuaFile( "class/monster_undead.lua" )
 AddCSLuaFile( "class/monster_shaman.lua" )
 
 include( "shared.lua" )
-include( "sh_controlpoints.lua" )
 include( "sv_buff.lua" )
 
 function GM:Initialize()
@@ -37,6 +37,13 @@ function GM:InitPostEntity()
 			if ( v.PrecedingPoint >= 1 ) then
 				v.Entity.PrecedingPoint = self.ControlPoints[v.PrecedingPoint].Entity
 			end
+		v.Entity:Spawn()
+	end
+	
+	for k, v in pairs( self.AltarSpawns ) do
+		v.Entity  = ents.Create("dc_altar")
+			v.Entity:SetPos( v.Position )
+			v.Entity:SetAngles( v.Rotation )
 		v.Entity:Spawn()
 	end
 
