@@ -31,7 +31,7 @@ function ENT:Initialize()
 	-- Change to the time at which the entity will be removed
 	self.Time = self.Time + CurTime()
 
-	-- Start particle affects on the head of the totem
+	-- Start particle effects on the head of the totem
 	ParticleEffectAttach( "fire_small_02", PATTACH_POINT_FOLLOW, self, 1 )
 end
 

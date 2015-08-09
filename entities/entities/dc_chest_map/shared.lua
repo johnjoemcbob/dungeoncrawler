@@ -72,7 +72,7 @@ if SERVER then
 
 		-- Spawn the loot giver
 		self.Loot = ents.Create( "dc_loot" )
-		self.Loot:SetPos( self:GetPos() )
+		self.Loot:SetPos( self:GetPos() + self:GetAngles():Up() * 10 )
 		self.Loot:Spawn()
 
 		-- Spawn the particle system

@@ -24,7 +24,7 @@ ENT.LightLevel = 2
 ENT.HeroesClaimed = {}
 
 -- Store the original position of the loot for resetting during animation
-ENT.DefaultPos = null
+ENT.DefaultPos = nil
 
 -- The outlying scale values to lerp between
 ENT.StartScale = 0.1
@@ -52,12 +52,13 @@ end
 
 if SERVER then
 	function ENT:Think()
-		-- Play the loot halo effect
-		local forward = self:GetUp()
-		local effectdata = EffectData()
-			effectdata:SetOrigin( self:GetPos() )
-			effectdata:SetAngles( self:GetAngles() )
-		self.OpenEffect = util.Effect( "dc_loothalo", effectdata )
+		-- Play glow effect
+		local gloweffect = EffectData()
+			gloweffect:SetOrigin( self:GetPos() + ( self:GetAngles():Up() * -45 ) )
+			gloweffect:SetAngles( Angle( -90, 0, 0 ) )	
+			gloweffect:SetRadius( 15 )
+		util.Effect( "AR2Explosion", gloweffect, true, true )
+	
 	end
 end
 

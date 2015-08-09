@@ -47,7 +47,7 @@ end
 function ENT:Think()
 	if ( SERVER ) then
 		-- Affect players within range
-		local entsinrange = ents.FindInSphere( self.Owner:GetPos(), self.Radius )
+		local entsinrange = ents.FindInSphere( self:GetPos(), self.Radius )
 		for k, v in pairs( entsinrange ) do
 			-- Is a player
 			if ( v:IsPlayer() ) then
@@ -64,7 +64,7 @@ function ENT:Think()
 			local effectdata = EffectData()
 				effectdata:SetOrigin( self:GetPos() + ( self:GetAngles():Forward() * 50 ) )
 				effectdata:SetAngles( Angle( 0, 0, 0 ) )
-			rain = util.Effect( "AntlionGib", effectdata, true, true )
+			util.Effect( "AntlionGib", effectdata, true, true )
 
 			self.NextEffect = CurTime() + self.BetweenEffect
 		end
