@@ -4,21 +4,12 @@
 
 if ( SERVER ) then
 	util.AddNetworkString( "DC_Client_Ghost" )
-	util.AddNetworkString( "DC_Client_Spells" )
 
 	function SendClientGhostInformation( ply, ghostply )
 		-- Send the ghost flag to client, in order to predict collisions and show the ghost specific HUD
 		net.Start( "DC_Client_Ghost" )
 			net.WriteFloat( ghostply:EntIndex() )
 			net.WriteBit( ghostply.Ghost )
-		net.Send( ply )
-	end
-
-	function SendClientSpellInformation( ply )
-		-- Send the ghost flag to client, in order to predict collisions and show the ghost specific HUD
-		net.Start( "DC_Client_Spells" )
-			net.WriteString( ply.Spells[1] or "" )
-			net.WriteString( ply.Spells[2] or "" )
 		net.Send( ply )
 	end
 end
@@ -50,10 +41,9 @@ function CLASS:Loadout( ply )
 		ply:Give( "dc_magichand" )
 
 		ply.Spells = {
-			"dc_projectile_fire",
-			"dc_totem_light"
+			"dc_spell_projectile_fireball",
+			"dc_spell_totem_light"
 		}
-		SendClientSpellInformation( ply )
 	end
 end
 

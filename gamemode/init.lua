@@ -14,11 +14,6 @@ AddCSLuaFile( "class/hero.lua" )
 AddCSLuaFile( "class/monster_undead.lua" )
 AddCSLuaFile( "class/monster_shaman.lua" )
 
-local files = file.Find( "gamemodes/dungeoncrawler/gamemode/spells/dc_*", "GAME" )
-for k, file in pairs( files ) do
-	AddCSLuaFile( "spells/"..file )
-end
-
 include( "shared.lua" )
 include( "sv_buff.lua" )
 

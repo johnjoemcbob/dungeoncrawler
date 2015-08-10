@@ -28,17 +28,12 @@ function CLASS:Loadout( ply )
 	ply:Give( "dc_magichand" )
 
 	ply.Spells = {
-		"dc_projectile_poison",
-		"dc_totem_shaman"
+		"dc_spell_projectile_poison",
+		"dc_spell_totem_shaman"
 	}
 end
 
 function CLASS:OnSpawn( ply )
-	ply.Ghost = nil
-	-- Send ghost status to all players
-	for k, v in pairs( player.GetAll() ) do
-		SendClientGhostInformation( v, ply )
-	end
 end
 
 function CLASS:OnDeath( pl, attacker, dmginfo )

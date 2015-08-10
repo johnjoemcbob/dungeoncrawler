@@ -17,7 +17,7 @@ net.Receive( "DC_Client_Buff", function( len )
 end )
 
 function GM:Initialize_Buffs()
-	-- Create a material cache for each icon
+	-- Create a material cache for each icon16/house
 	for k, v in pairs( self.Buffs ) do
 		v.Material = Material( v.Icon )
 	end
