@@ -24,18 +24,38 @@ local CLASS = {}
 	CLASS.FullRotation			= false
 
 function CLASS:Loadout( ply )
-	ply:Give( "dc_magichand" )
+	-- Heroes on live once
+	if ( not ply.Ghost ) then
+		ply:Give( "dc_magichand" )
 
-	ply.Spells = {
-		"dc_spell_projectile_fireball",
-		"dc_spell_totem_light"
-	}
+		ply.Spells = {
+			"dc_spell_projectile_fireball",
+			"dc_spell_totem_light"
+		}
+	end
 end
 
 function CLASS:OnSpawn( ply )
+	-- Flag as a ghost if they have spawned more than once
+	if ( ply.Ghost and ply.DeathPosition ) then
+		ply:SetPos( ply.DeathPosition )
+	end
 end
 
-function CLASS:OnDeath( pl, attacker, dmginfo )
+function CLASS:OnDeath( ply, attacker, dmginfo )
+	-- Flag as a ghost, a dead hero
+	ply.Ghost = true
+
+	-- Save death position for respawning
+	ply.DeathPosition = ply:GetPos()
+
+	-- Check end conditions
+	GAMEMODE:CheckEndConditions()
+
+	-- Auto respawn quickly afterwards
+    timer.Simple( 2, function()
+		ply:Spawn()
+	end )
 end
 
 function CLASS:Think( pl )

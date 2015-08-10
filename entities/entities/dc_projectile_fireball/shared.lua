@@ -63,21 +63,19 @@ function ENT:Initialize()
 end
 
 function ENT:Think()
-	-- Die when inside water
-	if ( SERVER ) then
-		if ( self:WaterLevel() > 0 ) then
-			self:BlowUp()
-		end
-	end
-
 	-- Increase projectile scale
 	if ( self.Scale < 1 ) then
 		self.Scale = math.Approach( self.Scale, 1, FrameTime() * 10 )
 		self:UpdateScale()
 	end
 
-	-- Emit fiery particles
 	if ( SERVER ) then
+		-- Die when inside water
+		if ( self:WaterLevel() > 0 ) then
+			self:BlowUp()
+		end
+
+		-- Emit fiery particles
 		local velocity = Vector( 0, 0, 0 )
 			local physics = self:GetPhysicsObject()
 			if ( physics and IsValid( physics ) ) then
@@ -88,11 +86,11 @@ function ENT:Think()
 			effectdata:SetOrigin( self:GetPos() )
 			effectdata:SetAngles( Angle( self:EntIndex(), 0, 0 ) )
 		self.OpenEffect = util.Effect( "dc_fire", effectdata )
-	end
 
-	-- Explode if the spell has gone out of range
-	if ( self.StartPos and ( self.StartPos:Distance( self:GetPos() ) > self.Range ) ) then
-		self:BlowUp()
+		-- Explode if the spell has gone out of range
+		if ( self.StartPos and ( self.StartPos:Distance( self:GetPos() ) > self.Range ) ) then
+			self:BlowUp()
+		end
 	end
 end
 

@@ -20,6 +20,7 @@ local plymeta = FindMetaTable( "Player" );
 
 function plymeta:AddBuff( id, buff )
 	if ( id <= 0 ) then return end
+	if ( self.Ghost ) then return end
 
 	-- Flag as affecting this player
 	self.Buffs[id] = CurTime() + buff.Time
@@ -39,6 +40,7 @@ function plymeta:RemoveBuff( id )
 end
 
 function plymeta:GetBuff( id )
+	if ( not self.Buffs ) then return nil end
 	return self.Buffs[id]
 end
 

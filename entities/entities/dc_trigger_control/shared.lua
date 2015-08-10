@@ -111,7 +111,7 @@ end
 -- NOTE: Players can also be removed from the zone by GM:PostPlayerDeath & GM:PlayerDisconnected (init.lua)
 if SERVER then
 	function ENT:StartTouch( entity )
-		if ( entity:IsPlayer() ) then
+		if ( entity:IsPlayer() and ( not entity.Ghost ) ) then
 			-- Store the player in this zone for capturing logic
 			self:AddPlayer( entity )
 		end
@@ -212,6 +212,9 @@ if SERVER then
 					for k, ply in pairs( player.GetAll() ) do
 						self:SendClientInformation_Capture( ply )
 					end
+
+					-- Check for round end; if this was the last point then heroes have won
+					GAMEMODE:CheckEndConditions()
 				end
 
 				-- Send every frame progress is changed

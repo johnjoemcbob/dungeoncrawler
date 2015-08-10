@@ -34,7 +34,7 @@ GM.ShowTeamName = true				-- Show the team name on the HUD
 
 GM.NoPlayerSuicide = true			-- Set to true if players should not be allowed to commit suicide.
 GM.NoPlayerDamage = false			-- Set to true if players should not be able to damage each other.
-									-- Friendly fire or no? Is important question.
+
 GM.NoPlayerSelfDamage = false		-- Allow players to hurt themselves?
 GM.NoPlayerTeamDamage = true		-- Allow team-members to hurt each other?
 GM.NoPlayerPlayerDamage = false 	-- Allow players to hurt each other?
@@ -43,7 +43,7 @@ GM.NoPlayerFootsteps = false		-- When true, all players have silent footsteps
 GM.PlayerCanNoClip = true			-- When true, players can use noclip without sv_cheats
 GM.TakeFragOnSuicide = true			-- -1 frag on suicide
 
-GM.MaximumDeathLength = 0			-- Player will repspawn if death length > this (can be 0 to disable)
+GM.MaximumDeathLength = 0			-- Player will respawn if death length > this (can be 0 to disable)
 GM.MinimumDeathLength = 0			-- Player has to be dead for at least this long
 GM.AutomaticTeamBalance = false     -- Teams will be periodically balanced 
 GM.ForceJoinBalancedTeams = false	-- Players won't be allowed to join a team if it has more players than another team
@@ -51,11 +51,11 @@ GM.RealisticFallDamage = true		-- Set to true if you want realistic fall damage 
 GM.AddFragsToTeamScore = true		-- Adds player's individual kills to team score (must be team based)
 
 GM.NoAutomaticSpawning = false		-- Players don't spawn automatically when they die, some other system spawns them
-GM.RoundBased = false				-- Round based, like CS
-GM.RoundLength = 0					-- Round length, in seconds
+GM.RoundBased = true				-- Round based, like CS
+GM.RoundLength = 3600				-- Round length, in seconds
 GM.RoundPreStartTime = 5			-- Preperation time before a round starts
 GM.RoundPostLength = 8				-- Seconds to show the 'x team won!' screen at the end of a round
-GM.RoundEndsWhenOneTeamAlive = true	-- CS Style rules
+GM.RoundEndsWhenOneTeamAlive = false-- CS Style rules
 
 GM.EnableFreezeCam = false			-- TF2 Style Freezecam
 GM.DeathLingerTime = 0				-- The time between you dying and it going into spectator mode, 0 disables
@@ -78,7 +78,7 @@ function GM:CreateTeams()
 	if ( !GAMEMODE.TeamBased ) then return end
 
 	team.SetUp( TEAM_HERO, "Heroes", Color( 80, 150, 255 ) )
-	team.SetSpawnPoint( TEAM_HERO, "info_player_start", true )
+	team.SetSpawnPoint( TEAM_HERO, { "info_player_start" }, true )
 	team.SetClass( TEAM_HERO, { "class_hero" } )
 	
 	team.SetUp( TEAM_MONSTER, "Monsters", Color( 255, 80, 80 ) )

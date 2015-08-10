@@ -97,15 +97,85 @@ function GM:OnContextMenuClose()
 end
 
 function GM:HUDPaint()
-	self:HUDPaint_ControlPoint_Overall( self )
-
-	self:HUDPaint_ControlPoint_Current()
-
+	-- Personal information
+	self:HUDPaint_Health()
+	self:HUDPaint_Mana()
 	self:HUDPaint_Buffs()
+
+	-- Control point information
+	self:HUDPaint_ControlPoint_Overall()
+	self:HUDPaint_ControlPoint_Current()
+end
+
+-- Display health
+function GM:HUDPaint_Health()
+	local width = ScrW() / 5
+	local height = ScrH() / 20
+	local x = ( ScrW() / 2 ) - ( width / 2 )
+	local y = ( ScrH() / 20 * 18 ) - ( height / 2 )
+	local borderdivision = 20
+
+	-- Health bar border
+	draw.RoundedBox(
+		0,
+		x, y,
+		width, height,
+		Color( 50, 50, 50, 150 )
+	)
+
+	-- Move the health bar inside the border
+	local x = x + height / borderdivision
+	local y = y + height / borderdivision
+	local width = width - ( height / borderdivision * 2 )
+	local height = height - ( height / borderdivision * 2 )
+
+	-- Health bar
+	draw.RoundedBox(
+		0,
+		x, y,
+		width * ( LocalPlayer():Health() / LocalPlayer():GetMaxHealth() ), height,
+		Color( 200, 50, 50, 255 )
+	)
+end
+
+-- Display mana
+function GM:HUDPaint_Mana()
+	if ( not LocalPlayer().Mana ) then
+		LocalPlayer().Mana = 100
+		LocalPlayer().MaxMana = 200
+	end
+
+	local width = ScrW() / 4
+	local height = ScrH() / 20
+	local x = ( ScrW() / 2 ) - ( width / 2 )
+	local y = ( ScrH() / 20 * 19.25 ) - ( height / 2 )
+	local borderdivision = 20
+
+	-- Mana bar border
+	draw.RoundedBox(
+		0,
+		x, y,
+		width, height,
+		Color( 50, 50, 50, 150 )
+	)
+
+	-- Move the mana bar inside the border
+	local x = x + height / borderdivision
+	local y = y + height / borderdivision
+	local width = width - ( height / borderdivision * 2 )
+	local height = height - ( height / borderdivision * 2 )
+
+	-- Mana bar
+	draw.RoundedBox(
+		0,
+		x, y,
+		width * ( LocalPlayer().Mana / LocalPlayer().MaxMana ), height,
+		Color( 50, 50, 200, 255 )
+	)
 end
 
 -- Display information about the overall location and state of all control points
-function GM:HUDPaint_ControlPoint_Overall( self )
+function GM:HUDPaint_ControlPoint_Overall()
 	-- Calculate the coordinates to display at, depending on the users resolution
 	-- (the control point positions are normalized on initialization)
 	local width = ScrW() / 10
@@ -170,6 +240,19 @@ function GM:HUDPaint_ControlPoint_Current()
 		progresscolour
 	)
 end
+
+-- Hide all of the default HUD elements
+local HUDHide = {
+	CHudHealth = true,
+	CHudBattery = true,
+	CHudSuitPower = true,
+	CHudAmmo = true,
+	CHudSecondaryAmmo = true,
+	CHudWeaponSelection = true
+}
+hook.Add( "HUDShouldDraw", "DC_HUDShouldDraw", function( name )
+	if ( HUDHide[ name ] ) then return false end
+end )
 
 -- From http://wiki.garrysmod.com/page/surface/DrawPoly
 function draw.Circle( x, y, radius, seg )
