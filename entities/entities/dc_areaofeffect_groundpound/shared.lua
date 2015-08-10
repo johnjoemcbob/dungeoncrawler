@@ -70,12 +70,12 @@ end
 
 if ( CLIENT ) then
 	function ENT:Draw()
-	
+
 	end
 end
 
 -- Base function used as part of any spells which act only at close range to the target
 -- NOTE: Intended to be overwritten by child spells, to add extra functionality
 -- function ENT:Cast_Touch_Affect( ply, target )
-	
+
 -- end
