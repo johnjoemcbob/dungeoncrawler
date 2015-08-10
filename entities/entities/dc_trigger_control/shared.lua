@@ -111,7 +111,7 @@ end
 -- NOTE: Players can also be removed from the zone by GM:PostPlayerDeath & GM:PlayerDisconnected (init.lua)
 if SERVER then
 	function ENT:StartTouch( entity )
-		if ( entity:IsPlayer() and ( not entity.Ghost ) ) then
+		if ( entity:IsPlayer() ) then
 			-- Store the player in this zone for capturing logic
 			self:AddPlayer( entity )
 		end
@@ -165,7 +165,7 @@ if SERVER then
 			local heroes = false
 			local monsters = false
 			for k, ply in pairs( self.PlayersContained ) do
-				if ( ply:Team() == TEAM_HERO ) then
+				if ( ( ply:Team() == TEAM_HERO ) and ( not ply.Ghost ) ) then
 					heroes = true
 				elseif ( ply:Team() == TEAM_MONSTER ) then
 					monsters = true

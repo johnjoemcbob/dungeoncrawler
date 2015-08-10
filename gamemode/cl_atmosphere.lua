@@ -72,6 +72,11 @@ function AtmosphereThink()
 		LocalPlayer().ClientSkybox:SetModelScale( 40, 0 )
 	else
 		LocalPlayer().ClientSkybox:SetPos( LocalPlayer():GetPos() - Vector( 0, 0, 1000 ) )
+		if ( LocalPlayer().Ghost ) then
+			LocalPlayer().ClientSkybox:SetColor( Color( 255, 255, 255, 255 ) )
+		else
+			LocalPlayer().ClientSkybox:SetColor( Color( 0, 0, 0, 255 ) )
+		end
 	end
 
 	-- Rain test particles
@@ -138,8 +143,8 @@ function PostProcess_DarkOutside()
 	local max = 100
 	local add = 20
 	local lightlevel = 0
-		-- Automatically add extra light if indoors or if the player is a monster
-		if ( LocalPlayer().Inside or ( LocalPlayer():Team() == TEAM_MONSTER ) ) then
+		-- Automatically add extra light if indoors, or if the player is a monster, or if the player is a dead hero
+		if ( LocalPlayer().Inside or ( LocalPlayer():Team() == TEAM_MONSTER ) or LocalPlayer().Ghost ) then
 			lightlevel = max * LightAffectInside
 		end
 	for k, v in pairs( ents.FindInSphere( LocalPlayer():GetPos(), LightAffectRadius ) ) do
@@ -152,8 +157,8 @@ function PostProcess_DarkOutside()
 	DC_PS_Brightness_Target = ps_dark_brightness + ( ( ps_default_brightness - ps_dark_brightness ) / max * lightlevel )
 	DC_PS_Contrast_Target = ps_dark_contrast + ( ( ps_default_contrast - ps_dark_contrast ) / max * lightlevel )
 	DC_PS_Colour_Target = ps_dark_colour + ( ( ps_default_colour - ps_dark_colour ) / max * lightlevel )
-		-- Monsters have a separate colour value
-		if ( LocalPlayer():Team() == TEAM_MONSTER ) then
+		-- Monsters/ghosts have a separate colour value
+		if ( ( LocalPlayer():Team() == TEAM_MONSTER ) or LocalPlayer().Ghost ) then
 			DC_PS_Colour_Target = ps_monster_colour
 		end
 

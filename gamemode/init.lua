@@ -76,6 +76,13 @@ function GM:PlayerInitialSpawn( ply )
 		end
 	end
 
+	-- Send ghost status to all players
+	for m, ply in pairs( player.GetAll() ) do
+		for k, v in pairs( player.GetAll() ) do
+			SendClientGhostInformation( v, ply )
+		end
+	end
+
 	-- Used to initialize the player buff table, function located within sv_buff.lua
 	self:PlayerInitialSpawn_Buff( ply )
 end
@@ -83,9 +90,13 @@ end
 function GM:PlayerSpawn( ply )
 	self.BaseClass:PlayerSpawn( ply )
 
+	-- Reset any buffs affecting the player
 	for k, buff in pairs( self.Buffs ) do
 		ply:RemoveBuff( k )
 	end
+
+	-- No players can zoom in this gamemode
+	ply:SetCanZoom( false )
 end
 
 function GM:PostPlayerDeath( ply )
@@ -102,19 +113,6 @@ function GM:PlayerDisconnected( ply )
 	if ( ply.TriggerZone and IsValid( ply.TriggerZone ) ) then
 		ply.TriggerZone:RemovePlayer( ply )
 	end
-end
-
-function GM:ShouldCollide( ent1, ent2 )
-	-- Spells fired by your own team should not collide with you
-	if
-		( ent1:IsSpell() and ent2:IsPlayer() ) or
-		( ent1:IsPlayer() and ent2:IsSpell() )
-	then
-		if ( ent1:Team() == ent2:Team() ) then
-			return false
-		end
-	end
-	return true
 end
 
 function GM:GetFallDamage( ply, flFallSpeed )
@@ -169,7 +167,16 @@ function GM:OnPreRoundStart( num )
 	-- Reset round logic
 	for k, ply in pairs( player.GetAll() ) do
 		ply.Ghost = nil
-		ply.NumberSpawns = nil
+		ply:SetCustomCollisionCheck( false )
+		if ( ply.OldMaterial ) then
+			ply:SetMaterial( ply.OldMaterial ) -- Draw visible again
+			ply.OldMaterial = nil
+		end
+
+		-- Send ghost status to all players
+		for k, v in pairs( player.GetAll() ) do
+			SendClientGhostInformation( v, ply )
+		end
 	end
 
 	UTIL_StripAllPlayers()
@@ -184,7 +191,9 @@ end
 function GM:OnRoundResult( result, resulttext )
 	team.AddScore( result, 1 )
 end
+
 -- Don't kill players if they are standing on the spawn point, some maps (i.e. rp_harmonti) only have one spawn
+-- Also, players will be moved to the appropriate area after spawning
 function GM:IsSpawnpointSuitable( ply, spawnpointent, bMakeSuitable )
 	local pos = spawnpointent:GetPos()
 

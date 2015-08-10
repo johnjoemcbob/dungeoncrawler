@@ -58,7 +58,8 @@ if SERVER then
 			-- Find nearby heroes/monsters
 			local nearents = ents.FindInSphere( self:GetPos(), self.OpenRadius )
 			for k, v in pairs( nearents ) do
-				if ( v:IsPlayer() ) then
+				-- A living hero player
+				if ( v:IsPlayer() and ( v:Team() == TEAM_HERO ) and ( not v.Ghost ) ) then
 					self:Open( v )
 				end
 			end

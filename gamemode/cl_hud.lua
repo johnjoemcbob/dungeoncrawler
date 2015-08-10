@@ -101,6 +101,7 @@ function GM:HUDPaint()
 	self:HUDPaint_Health()
 	self:HUDPaint_Mana()
 	self:HUDPaint_Buffs()
+	self:HUDPaint_Ghost()
 
 	-- Control point information
 	self:HUDPaint_ControlPoint_Overall()
@@ -109,6 +110,8 @@ end
 
 -- Display health
 function GM:HUDPaint_Health()
+	if ( LocalPlayer().Ghost ) then return end
+
 	local width = ScrW() / 5
 	local height = ScrH() / 20
 	local x = ( ScrW() / 2 ) - ( width / 2 )
@@ -140,6 +143,8 @@ end
 
 -- Display mana
 function GM:HUDPaint_Mana()
+	if ( LocalPlayer().Ghost ) then return end
+
 	if ( not LocalPlayer().Mana ) then
 		LocalPlayer().Mana = 100
 		LocalPlayer().MaxMana = 200
@@ -172,6 +177,51 @@ function GM:HUDPaint_Mana()
 		width * ( LocalPlayer().Mana / LocalPlayer().MaxMana ), height,
 		Color( 50, 50, 200, 255 )
 	)
+end
+
+-- Display ghost specific information on the HUD when dead
+function GM:HUDPaint_Ghost()
+	if ( not LocalPlayer().Ghost ) then return end
+
+	local width = ScrW() / 4
+	local height = ScrH() / 30
+	local x = ( ScrW() / 2 ) - ( width / 2 )
+	local y = ( ScrH() / 20 * 19.5 ) - ( height / 2 )
+	local borderdivision = 20
+
+	-- Ghost bar border
+	draw.RoundedBox(
+		0,
+		x, y,
+		width, height,
+		Color( 50, 50, 50, 150 )
+	)
+
+	-- Move the ghost bar inside the border
+	local x = x + height / borderdivision
+	local y = y + height / borderdivision
+	local width = width - ( height / borderdivision * 2 )
+	local height = height - ( height / borderdivision * 2 )
+
+	-- Ghost bar
+	draw.RoundedBox(
+		0,
+		x, y,
+		width * ( LocalPlayer().Mana / LocalPlayer().MaxMana ), height,
+		Color( 100, 50, 200, 255 )
+	)
+
+	-- Setup text
+	local text = "GHOST STRENGTH"
+	local font = "CloseCaption_Bold"
+	local textcolour = Color( 255, 255, 255, 255 )
+
+	-- Find the size of the text
+	surface.SetFont( font )
+	local _, size = surface.GetTextSize( text )
+
+	-- Display GHOST text
+	draw.DrawText( text, font, x + ( width / 2 ), y + ( height / 2 ) - ( size / 2 ), textcolour, TEXT_ALIGN_CENTER )
 end
 
 -- Display information about the overall location and state of all control points

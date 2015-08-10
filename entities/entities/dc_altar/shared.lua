@@ -90,7 +90,7 @@ function ENT:CheckHeroes()
 	for k, v in pairs( entsinrange ) do
 		-- Is a player
 		if ( v:IsPlayer() ) then
-			if ( v:Team() == TEAM_HERO ) then
+			if ( ( v:Team() == TEAM_HERO ) and ( not v.Ghost ) ) then
 				foundplayer = true
 			end
 		end

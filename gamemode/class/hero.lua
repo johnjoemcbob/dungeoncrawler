@@ -2,6 +2,18 @@
 -- 07/08/15
 -- Hero team base class
 
+if ( SERVER ) then
+	util.AddNetworkString( "DC_Client_Ghost" )
+
+	function SendClientGhostInformation( ply, ghostply )
+		-- Send the ghost flag to client, in order to predict collisions and show the ghost specific HUD
+		net.Start( "DC_Client_Ghost" )
+			net.WriteFloat( ghostply:EntIndex() )
+			net.WriteBit( ghostply.Ghost )
+		net.Send( ply )
+	end
+end
+
 local CLASS = {}
 	CLASS.DisplayName			= "Hero"
 	CLASS.WalkSpeed 			= 300
@@ -45,6 +57,14 @@ end
 function CLASS:OnDeath( ply, attacker, dmginfo )
 	-- Flag as a ghost, a dead hero
 	ply.Ghost = true
+	ply:SetCustomCollisionCheck( true )
+	ply.OldMaterial = ply:GetMaterial()
+	ply:SetMaterial( "models/effects/vol_light001" ) -- Draw invisible
+
+	-- Send ghost status to all players
+	for k, v in pairs( player.GetAll() ) do
+		SendClientGhostInformation( v, ply )
+	end
 
 	-- Save death position for respawning
 	ply.DeathPosition = ply:GetPos()
@@ -52,9 +72,11 @@ function CLASS:OnDeath( ply, attacker, dmginfo )
 	-- Check end conditions
 	GAMEMODE:CheckEndConditions()
 
-	-- Auto respawn quickly afterwards
+	-- Auto respawn quickly afterwards, if not already manually spawned
     timer.Simple( 2, function()
-		ply:Spawn()
+		if ( not ply:Alive() ) then
+			ply:Spawn()
+		end
 	end )
 end
 

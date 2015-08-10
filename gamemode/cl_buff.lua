@@ -24,6 +24,8 @@ function GM:Initialize_Buffs()
 end
 
 function GM:HUDPaint_Buffs()
+	if ( LocalPlayer().Ghost ) then return end
+
 	local x = 0
 	local y = ScrH() / 4
 	local size = ScrH() / 20

@@ -18,12 +18,17 @@ end
 
 local plymeta = FindMetaTable( "Player" );
 
-function plymeta:AddBuff( id, buff )
+function plymeta:AddBuff( id )
 	if ( id <= 0 ) then return end
 	if ( self.Ghost ) then return end
 
+	-- If the buff doesn't exist currently on the player, initialize it
+	if ( not self:GetBuff( id ) ) then
+		GAMEMODE.Buffs[id]:Init( self )
+	end
+
 	-- Flag as affecting this player
-	self.Buffs[id] = CurTime() + buff.Time
+	self.Buffs[id] = CurTime() + GAMEMODE.Buffs[id].Time
 
 	-- Send to client
 	SendClientBuffInformation( self, id )
@@ -31,6 +36,9 @@ end
 
 function plymeta:RemoveBuff( id )
 	if ( id <= 0 ) then return end
+
+	-- Run the cleanup logic of this buff on the player
+	GAMEMODE.Buffs[id]:Remove( ply )
 
 	-- Flag as not affecting this player
 	self.Buffs[id] = nil
@@ -54,12 +62,8 @@ function GM:Think_Buff()
 		for m, buff in pairs( self.Buffs ) do
 			local add = buff:ThinkActivate( ply )
 			if ( add and ( ( buff.Team == TEAM_BOTH ) or ( buff.Team == ply:Team() ) ) ) then
-				-- If the buff doesn't exist currently on the player, initialize it
-				if ( not ply:GetBuff( m ) ) then
-					buff:Init( ply )
-				end
 				-- Start the buff removal timer
-				ply:AddBuff( m, buff )
+				ply:AddBuff( m )
 			end
 		end
 
@@ -72,9 +76,6 @@ function GM:Think_Buff()
 					self.Buffs[m]:Think( ply )
 				-- Time up on the buff, remove
 				else
-					-- Run the cleanup logic of this buff on the player
-					-- NOTE: Cannot be in ply:RemoveBuff, depends on GM
-					self.Buffs[m]:Remove( ply )
 					-- Time up, remove timer
 					ply:RemoveBuff( m )
 				end

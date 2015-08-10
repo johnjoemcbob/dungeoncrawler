@@ -125,7 +125,7 @@ function ENT:BlowUp()
 		-- Is another player, on another team
 		if ( ( v:IsPlayer() ) and ( v:Team() ~= self.Owner:Team() ) ) then
 			v:TakeDamage( self.Damage, self.Owner, self )
-			v:AddBuff( 5, GAMEMODE.Buffs[5] )
+			v:AddBuff( 5 )
 		end
 	end
 
