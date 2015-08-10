@@ -235,7 +235,6 @@ end
 hook.Add( "PostDrawOpaqueRenderables", "AltarMenu", function()
 	
 	local altar = LocalPlayer().CurrentAltar
-	print(altar)	
 	if(altar != nil && IsValid(altar)) then
 		altar:OpenMenu()
 	end
