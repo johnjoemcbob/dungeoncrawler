@@ -5,7 +5,7 @@
 GM.Spells["dc_touch_physical"] =
 {
 	Name = "Claw Slash",
-	Icon = "icon16/thumbs_up.png",
+	Icon = "icon16/thumb_up.png",
 	Type = "Touch",
 	Cooldown = 1,
 	Create = function( self, ply, target )
