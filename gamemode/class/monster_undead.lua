@@ -31,6 +31,7 @@ function CLASS:Loadout( ply )
 		"dc_touch_physical",
 		"dc_areaofeffect_groundpound"
 	}
+	SendClientSpellInformation( ply )
 end
 
 function CLASS:OnSpawn( ply )

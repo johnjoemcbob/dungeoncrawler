@@ -31,6 +31,7 @@ function CLASS:Loadout( ply )
 		"dc_projectile_poison",
 		"dc_totem_shaman"
 	}
+	SendClientSpellInformation( ply )
 end
 
 function CLASS:OnSpawn( ply )
