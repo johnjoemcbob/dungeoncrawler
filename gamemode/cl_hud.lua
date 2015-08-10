@@ -344,7 +344,7 @@ hook.Add( "PostDrawOpaqueRenderables", "DC_DrawPlayerHealthBar", function()
 				local width = 48
 				local height = 8
 				local border = 2
-				local health = LocalPlayer():Health() / LocalPlayer():GetMaxHealth()
+				local health = v:Health() / v:GetMaxHealth()
 
 				cam.Start3D2D( v:GetPos() + Vector( 0, 0, 75 ), Angle( 180, LocalPlayer():EyeAngles().y + 90, -90 ), scale )
 					-- Draw health bar border
