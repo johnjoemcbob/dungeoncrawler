@@ -28,7 +28,9 @@ ENT.LightLevel = 2
 ENT.Radius = 50
 ENT.Active = false
 ENT.HornsIgnited = false
-
+ENT.PlayersInRange = {}
+ENT.PlayerMenuTime = 0
+ENT.AnimStage = 0
 
 function ENT:Initialize()
 	-- Set own model for table.
@@ -90,9 +92,17 @@ function ENT:CheckHeroes()
 	for k, v in pairs( entsinrange ) do
 		-- Is a player
 		if ( v:IsPlayer() ) then
-			if ( ( v:Team() == TEAM_HERO ) and ( not v.Ghost ) ) then
-				foundplayer = true
+			if ( v:Team() == TEAM_HERO ) then
+				if( SERVER ) then
+					foundplayer = true
+				end
 			end
+		end
+	end
+	
+	if( CLIENT ) then 
+		if(LocalPlayer():GetPos():Distance(self:GetPos()) < self.Radius) then
+			LocalPlayer().CurrentAltar = self
 		end
 	end
 	
@@ -115,7 +125,86 @@ function ENT:ExtinguishHorns()
 	self.HornsIgnited = false
 end
 
+function ENT:OpenMenu()
+	if( CLIENT ) then
+		if( self:GetPos():Distance( LocalPlayer():GetPos() ) <= self.Radius * 1.5 ) then
+			-- Increment animation timer
+			self.PlayerMenuTime = self.PlayerMenuTime + 1
+			
+			if(self.PlayerMenuTime >= 300) then
+				self.PlayerMenuTime = 300
+			end
+			
+			
+			-- Get list of available spells -- GM.Spells!
+			
+			-- Check animation stage and render accordingly, rendering a card for each spell
+			if(self.AnimStage == 0) then
+				-- Stage 1: Cards are face-down, and rotate up to face the viewer.
+					--for k, v in pairs( GM.Spells ) do
+						-- Draw card per spell	(separate 3D2D calls? individual card rotations that way)								
+						self:Draw3D2DCard(0, 0, self.PlayerMenuTime / 300 * -90)
+				--end
+			end
+			
+			
+			
+			-- When the player presses use...		
+				-- Check the player's eye traces against each card
+				-- If a card is hit...
+					-- Pick this spell, disable the first-picked spell and move second-picked to first-picked slot.
+				
+	
+		else
+			self.PlayerMenuTime = 0
+		end
+	end
+end
 
+
+--    /!\ UGLY 3D2D CODE /!\
+--	IT'S A DISGRACE, DON'T LOOK
+--==============================
+
+function ENT:Draw3D2DCard(cardnum, cardinfo, rotamt)
+
+	if( CLIENT ) then
+		if(cardnum == nil) then
+			cardnum = 0
+		end
+
+		
+		if(rotamt > -45) then
+			-- Front-Side of Spell Card
+			cam.Start3D2D( self:GetPos() + self:GetAngles():Up() * 35 + (Vector( 0, -rotamt / 15,  rotamt / 35 ) * self:GetAngles():Forward()) + (self:GetAngles():Up() * (math.sin(CurTime()))), self:GetAngles() + Angle( 180 + rotamt, 0, 0 ), 1 )
+				surface.SetDrawColor( Color( 255, 255, 255, 255 ))
+				surface.DrawRect(0, 0+cardnum*16, -15, 7)
+			cam.End3D2D()
+			
+			-- Back-Side of Spell Card
+			cam.Start3D2D( self:GetPos() + self:GetAngles():Up() * 35.1 +(Vector( 0, -rotamt / 14.8,  rotamt / 35 ) * self:GetAngles():Forward())  + (self:GetAngles():Up() * (math.sin(CurTime()))) , self:GetAngles() + Angle( 0 + rotamt, 0, 0 ), 1 )
+				surface.SetDrawColor( Color( math.sin(CurTime() / 0.70) * 100 + 100, 25, math.cos(CurTime() / 0.75) * 100 + 100, 255 ) )	
+				surface.DrawRect(0, 0+cardnum*16, 15, 7)
+			cam.End3D2D()		
+		else
+
+			
+			-- Back-Side of Spell Card
+			cam.Start3D2D( self:GetPos() + self:GetAngles():Up() * 35.1 + (Vector( 0, -rotamt / 14.8,  rotamt / 35 ) * self:GetAngles():Forward())  + (self:GetAngles():Up() * (math.sin(CurTime()))) , self:GetAngles() + Angle( 0 + rotamt, 0, 0 ), 1 )
+				surface.SetDrawColor( Color( math.sin(CurTime() / 0.70) * 100 + 100, 25, math.cos(CurTime() / 0.75) * 100 + 100, 255 ) )	
+				surface.DrawRect(0, 0+cardnum*16, 15, 7)
+			cam.End3D2D()	
+			
+			-- Front-Side of Spell Card
+			cam.Start3D2D( self:GetPos() + self:GetAngles():Up() * 35 + (Vector( 0, -rotamt / 15,  rotamt / 35 ) * self:GetAngles():Forward())  + (self:GetAngles():Up() * (math.sin(CurTime()))), self:GetAngles() + Angle( 180 + rotamt, 0, 0 ), 1 )
+				surface.SetDrawColor( Color( 255, 255, 255, 255 ))
+				surface.DrawRect(0, 0+cardnum*16, -15, 7)
+			cam.End3D2D()
+		end
+	end
+	
+
+end
 
 function ENT:Think()
 	-- The spell altar should light up the horns when heroes get close, and then extinguish if nobody is nearby.
@@ -131,9 +220,25 @@ function ENT:Think()
 			self:ExtinguishHorns()
 		end
 	end
-	
-	
-	
-	-- If we found players, bring up menu for each of them on clientside? TODO
-	-- if( CLIENT ) then
+
+
+
 end
+
+function ENT:Draw()
+	self:DrawModel()
+	
+
+end
+
+-- Hook for 3D2D
+hook.Add( "PostDrawOpaqueRenderables", "AltarMenu", function()
+	
+	local altar = LocalPlayer().CurrentAltar
+	print(altar)	
+	if(altar != nil && IsValid(altar)) then
+		altar:OpenMenu()
+	end
+	
+	
+end )
