@@ -17,6 +17,13 @@ include( "sh_controlpoints.lua" )
 include( "sh_altar_spawns.lua" )
 include( "sh_buff.lua" )
 
+-- Include all spells defined
+GM.Spells = {}
+local files = file.Find( "gamemodes/dungeoncrawler/gamemode/spells/dc_*", "GAME" )
+for k, file in pairs( files ) do
+	include( "spells/"..file )
+end
+
 GM.Name 	= "Dungeon Crawler"
 GM.Author 	= "\nMatthew Cormack (@johnjoemcbob)\nNichlas Rager (@dasomeone)\nJordan Brown (@DrMelon)"
 GM.Email 	= ""
@@ -88,4 +95,23 @@ function GM:CreateTeams()
 	team.SetUp( TEAM_SPECTATOR, "Spectators", Color( 200, 200, 200 ), true )
 	team.SetSpawnPoint( TEAM_SPECTATOR, "info_player_start" )
 	team.SetClass( TEAM_SPECTATOR, { "Spectator" } )
+end
+
+function GM:ShouldCollide( ent1, ent2 )
+	-- Spells fired by your own team should not collide with you
+	if
+		( ent1.IsSpell and ent1:IsSpell() and ent2:IsPlayer() ) or
+		( ent1:IsPlayer() and ent2.IsSpell and  ent2:IsSpell() )
+	then
+		if ( ent1:Team() == ent2:Team() ) then
+			return false
+		end
+	end
+
+	-- Ghost players should not collide with anything
+	if ( ent1.Ghost or ent2.Ghost ) then
+		return false
+	end
+
+	return true
 end
