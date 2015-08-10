@@ -31,56 +31,57 @@ ENT.HornsIgnited = false
 
 
 function ENT:Initialize()
-	
 	-- Set own model for table.
 	self:SetModel( "models/props_combine/breendesk.mdl" )
 	self:SetSolid( SOLID_VPHYSICS )
+	self:SetSolid( SOLID_VPHYSICS )
 	self.DefaultPos = self:GetPos()
 
-	
+	-- Store the old angles and reset to default for decoration setup
+	local oldangles = self:GetAngles()
+	self:SetAngles( Angle( 0, 180, 0 ) )
+
 	if SERVER then
 		-- Spawn the altar's decorations
-		
+
 		-- Skull-holder (boat cleat)
 		self.SkullHolder = ents.Create( "prop_dynamic" )
 		self.SkullHolder:SetModel( "models/props_docks/dock01_cleat01a.mdl" )
 		self.SkullHolder:SetAngles( Angle( 0, 90, 0 ) )
 		self.SkullHolder:SetPos( self:GetPos() + ( self:GetAngles():Forward() * -15 ) + (self:GetAngles():Up() * 25 ) )
 		self.SkullHolder:SetParent( self.Entity )
-		
+
 		-- Skull
 		self.Skull = ents.Create( "prop_dynamic" )
 		self.Skull:SetModel( "models/Gibs/HGIBS.mdl" )
-		self.Skull:SetAngles( Angle( 0, 0, 0 ) )
+		self.Skull:SetAngles( Angle( 0, 180, 0 ) )
 		self.Skull:SetPos( self.SkullHolder:GetPos() + ( self.SkullHolder:GetAngles():Up() * 15 ) )
 		self.Skull:SetParent( self.SkullHolder )
-		
+
 		-- Skull Horn (Left)
 		self.SkullHornL = ents.Create( "prop_dynamic" )
 		self.SkullHornL:SetModel( "models/Gibs/HGIBS_spine.mdl" )
-		self.SkullHornL:SetAngles( Angle( 0, 0, -30) )
+		self.SkullHornL:SetAngles( Angle( 0, 180, -30) )
 		self.SkullHornL:SetPos( self.Skull:GetPos() + ( self.Skull:GetAngles():Up() * 5 ) + ( self.Skull:GetAngles():Right() * -5 ) )
-		self.SkullHornL:SetParent( self.SkullHolder )	
-		
+		self.SkullHornL:SetParent( self.SkullHolder )
+
 		-- Skull Horn (Right)
 		self.SkullHornR = ents.Create( "prop_dynamic" )
 		self.SkullHornR:SetModel( "models/Gibs/HGIBS_spine.mdl" )
-		self.SkullHornR:SetAngles( Angle( 0, 180, -30) )
+		self.SkullHornR:SetAngles( Angle( 0, 0, -30) )
 		self.SkullHornR:SetPos( self.Skull:GetPos() + ( self.Skull:GetAngles():Up() * 5 ) + ( self.Skull:GetAngles():Right() * 5 ) )
-		self.SkullHornR:SetParent( self.SkullHolder )	
-		
+		self.SkullHornR:SetParent( self.SkullHolder )
+
 		-- Decorative Tablet
 		self.Tablet = ents.Create( "prop_dynamic" )
 		self.Tablet:SetModel( "models/props_c17/Frame002a.mdl" )
 		self.Tablet:SetAngles( Angle( 90, 0, 0 ) )
 		self.Tablet:SetPos( self.Entity:GetPos() + ( self.Entity:GetAngles():Up() * 31 ) )
-		self.Tablet:SetParent( self.Entity )		
-		
-
-		
-		
+		self.Tablet:SetParent( self.Entity )
 	end
-	
+
+	-- Change back to real angles now that the decorations are parented
+	self:SetAngles( oldangles )
 end
 
 function ENT:CheckHeroes()

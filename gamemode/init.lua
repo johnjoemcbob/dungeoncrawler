@@ -41,9 +41,10 @@ function GM:SpawnMapItems()
 			end
 		v.Entity:Spawn()
 	end
-	
+
+	-- Spawn spell altars on the map
 	for k, v in pairs( self.AltarSpawns ) do
-		v.Entity  = ents.Create("dc_altar")
+		v.Entity = ents.Create( "dc_altar" )
 			v.Entity:SetPos( v.Position )
 			v.Entity:SetAngles( v.Rotation )
 		v.Entity:Spawn()

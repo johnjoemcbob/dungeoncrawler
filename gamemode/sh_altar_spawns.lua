@@ -11,10 +11,9 @@
 -- a bonus/secret point)
 --
 
-
 GM.AltarSpawns = {}
 
--- Spawn Area
+-- Spawn Area (Auberge)
 table.insert(
 	GM.AltarSpawns,
 	{
@@ -22,37 +21,39 @@ table.insert(
 		Rotation = Angle( 0, 0, 0 )
 	}
 )
--- Blacksmith
+
+-- Blacksmith (Grilleau)
 table.insert(
 	GM.AltarSpawns,
 	{
-		Position = Vector( 132, 234, -504 ),
+		Position = Vector( 140, 234, -504 ),
 		Rotation = Angle( 0, 0, 0 )
 	}
 )
--- Small Tower
+
+-- Small Tower (Near Landebrin)
 table.insert(
 	GM.AltarSpawns,
 	{
 		Position = Vector( 2381, -6483, -398 ),
-		Rotation = Angle( 0, 180, 0 )
+		Rotation = Angle( 0, 0, 0 )
 	}
 )
 
--- Village Tower
+-- Village (Landebrin) Tower
 table.insert(
 	GM.AltarSpawns,
 	{
 		Position = Vector( 5388, -6266, 659 ),
-		Rotation = Angle( 0, 90, 0 )
+		Rotation = Angle( 0, -90, 0 )
 	}
 )
 
--- Forest Tower
+-- Small Forest Tower (Near Grilleau)
 table.insert(
 	GM.AltarSpawns,
 	{
 		Position = Vector( 1148, 6961, -340 ),
-		Rotation = Angle( 0, 0, 0 )
+		Rotation = Angle( 0, 180, 0 )
 	}
 )
