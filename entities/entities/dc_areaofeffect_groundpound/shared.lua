@@ -1,9 +1,6 @@
 -- Matthew Cormack (@johnjoemcbob)
 -- 07/08/15
--- Basic physical damage touch spell
-
--- The range of this spell
-ENT.Range = 50
+-- Area of effect ground pound; player launches into the air and activates pound on landing
 
 -- The radius of any touch/area of affect spells
 ENT.Radius = 350
@@ -22,15 +19,26 @@ if SERVER then
 end
 
 ENT.Type = "anim"
-ENT.Base = "dc_spell_base"
 
 function ENT:Initialize()
+	if ( SERVER ) then
+		-- Store the current z position of the player, so more damage can be dealt based on the height fallen
+		self.StartZ = self.Owner:GetPos().z
+
+		-- Fire self upwards
+		self.Owner:SetVelocity( self.Owner:GetVelocity() + Vector( 0, 0, 500 ) )
+
+		-- Flag that the player may survive this fall
+		if ( self.Owner.NoFallDamage ~= -1 ) then
+			self.Owner.NoFallDamage = ( self.Owner.NoFallDamage or 0 ) + 1
+		end
+	end
 end
 
 function ENT:Think()
 	if ( SERVER ) then
 		-- If the player has landed on the ground or in the water after being fired into the air, activate spell
-		if ( self.HasCast and ( self.Owner:IsOnGround() or ( self.Owner:WaterLevel() > 0 ) ) ) then
+		if ( self.Owner:IsOnGround() or ( self.Owner:WaterLevel() > 0 ) ) then
 			-- Cause damage to surrounding players
 			local extra = math.Clamp( self.StartZ - self.Owner:GetPos().z, -self.ExtraHeight, self.ExtraHeight ) / self.ExtraHeight
 			local damage = self.Damage + ( extra * ( self.Damage / self.ExtraDamage ) )
@@ -60,23 +68,9 @@ function ENT:Think()
 	end
 end
 
--- Called by dc_magichands/shared.lua when this spell is activated
-function ENT:Cast( ply )
-	-- Must be on solid ground to cast
-	if ( not ply:OnGround() ) then return end
-
-	-- Flag as cast for Think
-	self.HasCast = true
-
-	-- Store the current z position of the player, so more damage can be dealt based on the height fallen
-	self.StartZ = ply:GetPos().z
-
-	-- Fire self upwards
-	ply:SetVelocity( ply:GetVelocity() + Vector( 0, 0, 500 ) )
-
-	-- Flag that the player may survive this fall
-	if ( ply.NoFallDamage ~= -1 ) then
-		ply.NoFallDamage = ( ply.NoFallDamage or 0 ) + 1
+if ( CLIENT ) then
+	function ENT:Draw()
+	
 	end
 end
 

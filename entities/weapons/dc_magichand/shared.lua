@@ -55,10 +55,8 @@ end
 function SWEP:PrimaryAttack( right )
 	if ( SERVER ) then
 		if ( CurTime() > self.Primary.NextCast ) then
-			local spell = ents.Create( self.Owner.Spells[1] )
-			spell.Owner = self.Owner
-			spell:Spawn()
-			spell:Cast( self.Owner )
+			local spell = GAMEMODE.Spells[self.Owner.Spells[1]]
+			self:Cast( spell )
 
 			self.Primary.NextCast = CurTime() + spell.Cooldown
 		end
@@ -68,10 +66,8 @@ end
 function SWEP:SecondaryAttack()
 	if ( SERVER ) then
 		if ( CurTime() > self.Secondary.NextCast ) then
-			local spell = ents.Create( self.Owner.Spells[2] )
-			spell.Owner = self.Owner
-			spell:Spawn()
-			spell:Cast( self.Owner )
+			local spell = GAMEMODE.Spells[self.Owner.Spells[2]]
+			self:Cast( spell )
 
 			self.Secondary.NextCast = CurTime() + spell.Cooldown
 		end
@@ -169,4 +165,95 @@ function SWEP:Think()
 	end
 
 	ViewModel_Angle_Roll = ViewModel_Angle_Roll + 0.001
+end
+
+function SWEP:Cast( spell )
+	if ( spell.Type == "Totem" ) then
+		self:Cast_TrapTotem( spell )
+	elseif ( spell.Type == "Projectile" ) then
+		self:Cast_Projectile( spell )
+	elseif ( spell.Type == "Touch" ) then
+		self:Cast_Touch( spell )
+	elseif ( spell.Type == "Misc" ) then
+		self:Cast_Misc( spell )
+	end
+end
+
+-- Base function for any spells which create world traps to hurt heroes,
+-- or totems to buff heroes/debuff monsters
+function SWEP:Cast_TrapTotem( spell )
+	local firstendpos = self.Owner:EyePos() + self.Owner:EyeAngles():Forward() * spell.Range
+	local tr = util.TraceLine( {
+		start = self.Owner:EyePos(),
+		endpos = firstendpos,
+		mask = MASK_SOLID_BRUSHONLY
+	} )
+	-- If it hits nothing, project forward by the max range and then fire downwards
+	if ( not tr.Hit ) then
+		tr = util.TraceLine( {
+			start = firstendpos,
+			endpos = firstendpos + self.Owner:EyeAngles():Up() * -spell.Range,
+			mask = MASK_SOLID_BRUSHONLY
+		} )
+	end
+
+	-- If it hit something, continue on to creating the trap/totem at the point hit
+	if ( tr.Hit ) then
+		local spellent = spell:Create( self.Owner, tr )
+		spellent.Owner = self.Owner
+		if ( spell.TotemRotate ) then
+			self:Cast_TrapTotem_Rotate( spellent, tr )
+		end
+	end
+end
+
+-- Base function used as part of any spells which create world traps to hurt heroes,
+-- or totems to buff heroes/debuff monsters
+-- Used to rotate traps/totems depending on the hit normal of the surface cast on
+function SWEP:Cast_TrapTotem_Rotate( spell, trace )
+	-- Rotate the totem based on the trace hit normal
+	local angle = trace.HitNormal:Angle()
+	-- If the totem has been placed on a near vertical wall
+	if (
+		( math.abs( math.AngleDifference( angle.p, 0 ) ) <= 20 ) and
+		( math.abs( math.AngleDifference( angle.r, 0 ) ) <= 20 )
+	) then
+		spell:SetAngles( spell:GetAngles() + ( ( -angle:Forward() * 10 ) + ( angle:Up() * 2 ) ):Angle() )
+	end
+end
+
+-- Base function for any spells which fire a projectile
+function SWEP:Cast_Projectile( spell )
+	local spell, angle = spell:Create( self.Owner, self.Owner:GetPos() + Vector( 0, 0, 50 ) )
+	spell.Owner = self.Owner
+
+	-- Project forward out of the player a little
+	local forward = ( self.Owner:EyeAngles() + angle ):Forward()
+	spell:SetPos( spell:GetPos() + ( forward * 50 ) )
+
+	-- Fire the projectile
+	local physics = spell:GetPhysicsObject()
+	if ( physics and IsValid( physics ) ) then
+		physics:AddVelocity( forward * spell.Speed )
+	end
+end
+
+-- Base function for any spells which are close proximity
+function SWEP:Cast_Touch( spell )
+	-- Project forward out of the player a little
+	local forward = self.Owner:EyeAngles():Forward() * self.Range
+	local entsinrange = ents.FindInSphere( self.Owner:GetPos() + forward, spell.Radius )
+	for k, v in pairs( entsinrange ) do
+		-- Is another player
+		-- NOTE: Team checking logic is done on a spell by spell basic, to allow for touch buffs for allies, and touch damages for enemies
+		if ( ( v:IsPlayer() ) and ( v ~= self.Owner ) ) then
+			spell:Create( self.Owner, v )
+		end
+	end
+end
+
+-- Base function for any spells which have their own logic
+function SWEP:Cast_Misc( spell )
+	local spell, angle = spell:Create( self.Owner, self.Owner:GetPos() )
+	spell.Owner = self.Owner
 end

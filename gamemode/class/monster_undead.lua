@@ -28,12 +28,17 @@ function CLASS:Loadout( ply )
 	ply:Give( "dc_magichand" )
 
 	ply.Spells = {
-		"dc_spell_touch_physical",
-		"dc_spell_groundpound"
+		"dc_touch_physical",
+		"dc_areaofeffect_groundpound"
 	}
 end
 
 function CLASS:OnSpawn( ply )
+	ply.Ghost = nil
+	-- Send ghost status to all players
+	for k, v in pairs( player.GetAll() ) do
+		SendClientGhostInformation( v, ply )
+	end
 end
 
 function CLASS:OnDeath( pl, attacker, dmginfo )

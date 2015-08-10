@@ -8,6 +8,14 @@ local Progress = 0
 -- The table of information about the control point minimap
 local Minimap = {}
 
+-- Initialization of this message is contained within hero.lua
+net.Receive( "DC_Client_Spells", function( len )
+	LocalPlayer().Spells = {
+		net.ReadString(),
+		net.ReadString()
+	}
+end )
+
 -- Initialization of this message is contained within dc_trigger_control/shared.lua
 net.Receive( "DC_Client_ControlPoint", function( len )
 	LocalPlayer().ControlPoint = {
@@ -82,6 +90,11 @@ function GM:Initialize_HUD()
 			MonsterControlled = true
 		} )
 	end
+
+	-- Create a material cache for each icon
+	for k, v in pairs( self.Spells ) do
+		v.Material = Material( v.Icon )
+	end
 end
 
 function GM:ContextMenuOpen()
@@ -101,6 +114,7 @@ function GM:HUDPaint()
 	self:HUDPaint_Health()
 	self:HUDPaint_Mana()
 	self:HUDPaint_Buffs()
+	self:HUDPaint_Spells()
 	self:HUDPaint_Ghost()
 
 	-- Control point information
@@ -224,6 +238,32 @@ function GM:HUDPaint_Ghost()
 	draw.DrawText( text, font, x + ( width / 2 ), y + ( height / 2 ) - ( size / 2 ), textcolour, TEXT_ALIGN_CENTER )
 end
 
+-- Display spells
+function GM:HUDPaint_Spells()
+	if ( LocalPlayer().Ghost ) then return end
+	if ( not LocalPlayer().Spells ) then return end
+
+	local size = ScrH() / 20
+	local x = ScrW() / 4
+	local y = ScrH() - size
+
+	for spell = 1, 2 do
+		if ( LocalPlayer().Spells[spell] ~= "" ) then
+			-- Backdrop
+			surface.SetDrawColor( 181, 140, 50, 200 )
+			surface.DrawRect( x, y, size, size )
+
+			-- Icon
+			surface.SetDrawColor( 255, 255, 255, 255 )
+			surface.SetMaterial( self.Spells[LocalPlayer().Spells[spell]].Material	)
+			surface.DrawTexturedRect( x, y, size, size )
+		end
+
+		-- Move over
+		x = x + ( ScrW() / 2 )
+	end
+end
+
 -- Display information about the overall location and state of all control points
 function GM:HUDPaint_ControlPoint_Overall()
 	-- Calculate the coordinates to display at, depending on the users resolution
@@ -290,6 +330,35 @@ function GM:HUDPaint_ControlPoint_Current()
 		progresscolour
 	)
 end
+
+hook.Add( "PostDrawOpaqueRenderables", "DC_DrawPlayerHealthBar", function()
+	-- For each player, draw their health bar above their head
+	for k, v in pairs( player.GetAll() ) do
+		-- Different player
+		if ( v ~= LocalPlayer() ) then
+			-- Max distance the health bar will be visible at
+			local distance = v:GetPos():Distance( LocalPlayer():GetPos() )
+			if ( distance < 1000 ) then
+				-- Initialize sizes
+				local scale = 0.5
+				local width = 48
+				local height = 8
+				local border = 2
+				local health = LocalPlayer():Health() / LocalPlayer():GetMaxHealth()
+
+				cam.Start3D2D( v:GetPos() + Vector( 0, 0, 75 ), Angle( 180, LocalPlayer():EyeAngles().y + 90, -90 ), scale )
+					-- Draw health bar border
+					surface.SetDrawColor( Color( 50, 50, 50, 150 ) )
+					surface.DrawRect( -( width / 2 ), -( height / 2 ), width, height )
+
+					-- Draw health bar
+					surface.SetDrawColor( Color( 255, 50, 50, 200 ) )
+					surface.DrawRect( -( width / 2 ) + ( border / 2 ), -( height / 2 ) + ( border / 2 ), ( width * health ) - border, height - border )
+				cam.End3D2D()
+			end
+		end
+	end
+end )
 
 -- Hide all of the default HUD elements
 local HUDHide = {
