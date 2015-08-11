@@ -6,13 +6,13 @@ local function collide( particle, position, normal )
 	particle:SetDieTime( 0 )
 
 	-- Emit a new particle for the splash effect
-	if ( math.random( 1, 70 ) == 1 ) then
-		local effectdata = EffectData() 
-			effectdata:SetStart( position )
-			effectdata:SetOrigin( position ) 
-			effectdata:SetScale( math.random( 1,3 ) )
-		util.Effect( "watersplash", effectdata )
-	end
+	-- if ( math.random( 1, 70 ) == 1 ) then
+		-- local effectdata = EffectData() 
+			-- effectdata:SetStart( position )
+			-- effectdata:SetOrigin( position ) 
+			-- effectdata:SetScale( math.random( 1, 3 ) )
+		-- util.Effect( "watersplash", effectdata )
+	-- end
 end
 
 function EFFECT:Init( data )

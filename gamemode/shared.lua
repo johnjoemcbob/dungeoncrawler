@@ -10,6 +10,38 @@ TEAM_HERO 		= 1
 TEAM_MONSTER 	= 2
 TEAM_BOTH		= 3
 
+-- Define round text and enums
+GM.RoundText = {}
+ROUNDTEXT_PRE = 1
+ROUNDTEXT_BEGIN = 2
+ROUNDTEXT_WIN_MONSTER = 3
+ROUNDTEXT_WIN_HERO = 4
+
+GM.RoundText[ROUNDTEXT_PRE] = {
+	Text = "Round starting in... %i",
+	Font = "CloseCaption_Bold",
+	TextColour = Color( 255, 255, 255, 255 ),
+	BackdropColour = Color( 50, 50, 50, 150 ),
+}
+GM.RoundText[ROUNDTEXT_BEGIN] = {
+	Text = "Round begin!",
+	Font = "CloseCaption_Bold",
+	TextColour = Color( 255, 255, 255, 255 ),
+	BackdropColour = Color( 50, 50, 50, 150 ),
+}
+GM.RoundText[ROUNDTEXT_WIN_MONSTER] = {
+	Text = "MONSTER WIN\nHeroes annihilated!\n%i",
+	Font = "CloseCaption_Bold",
+	TextColour = Color( 255, 50, 50, 255 ),
+	BackdropColour = Color( 50, 50, 50, 150 ),
+}
+GM.RoundText[ROUNDTEXT_WIN_HERO] = {
+	Text = "HERO WIN\nLand reclaimed!\n%i",
+	Font = "CloseCaption_Bold",
+	TextColour = Color( 50, 50, 255, 255 ),
+	BackdropColour = Color( 50, 50, 50, 150 ),
+}
+
 include( "class/hero.lua" )
 include( "class/monster_undead.lua" )
 include( "class/monster_shaman.lua" )

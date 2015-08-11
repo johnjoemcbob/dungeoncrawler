@@ -5,9 +5,9 @@
 
 local CLASS = {}
 	CLASS.DisplayName			= "Undead"
-	CLASS.WalkSpeed 			= 300
+	CLASS.WalkSpeed 			= 100
 	CLASS.CrouchedWalkSpeed 	= 0.2
-	CLASS.RunSpeed				= 500
+	CLASS.RunSpeed				= 300
 	CLASS.DuckSpeed				= 0.2
 	CLASS.JumpPower				= 200
 	CLASS.PlayerModel			= player_manager.TranslatePlayerModel( "corpse" )

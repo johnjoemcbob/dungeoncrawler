@@ -53,8 +53,8 @@ function ENT:Think()
 			if ( v:IsPlayer() ) then
 				if ( v:Team() == TEAM_HERO ) then
 					v:AddBuff( 3, GAMEMODE.Buffs[3] )
-				elseif ( v:Team() == TEAM_MONSTER ) then
-					v:AddBuff( 4, GAMEMODE.Buffs[4] )
+				-- elseif ( v:Team() == TEAM_MONSTER ) then
+					-- v:AddBuff( 4, GAMEMODE.Buffs[4] )
 				end
 			end
 		end

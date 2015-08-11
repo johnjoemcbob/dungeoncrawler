@@ -149,22 +149,24 @@ function SWEP:Think()
 	local curtime = CurTime()
 	local idletime = self:GetNextIdle()
 
-	vm:SendViewModelMatchingSequence( vm:LookupSequence( "fists_draw" ) )
+	if ( vm and IsValid( vm ) ) then
+		vm:SendViewModelMatchingSequence( vm:LookupSequence( "fists_draw" ) )
 
-	if ( CLIENT ) then
-		if ( not input.IsKeyDown( KEY_Q ) ) then
-			AnimTime = AnimTime + ( AnimDir * FrameTime() * 0.3 )
-				if ( AnimTime > 0.5 ) then AnimDir = -1 end
-				if ( AnimTime < 0.12 ) then AnimDir = 1 end
-			vm:SetAnimTime( curtime - AnimTime )
-		else
-			AnimTime = AnimTime + math.random( 0.005, 0.0075 )
-				if ( AnimTime > math.random( 0.275, 0.285 ) ) then AnimTime = math.random( 0.285, 0.305 ) end
-			vm:SetAnimTime( curtime - AnimTime )
+		if ( CLIENT ) then
+			if ( not input.IsKeyDown( KEY_Q ) ) then
+				AnimTime = AnimTime + ( AnimDir * FrameTime() * 0.3 )
+					if ( AnimTime > 0.5 ) then AnimDir = -1 end
+					if ( AnimTime < 0.12 ) then AnimDir = 1 end
+				vm:SetAnimTime( curtime - AnimTime )
+			else
+				AnimTime = AnimTime + math.random( 0.005, 0.0075 )
+					if ( AnimTime > math.random( 0.275, 0.285 ) ) then AnimTime = math.random( 0.285, 0.305 ) end
+				vm:SetAnimTime( curtime - AnimTime )
+			end
 		end
-	end
 
-	ViewModel_Angle_Roll = ViewModel_Angle_Roll + 0.001
+		ViewModel_Angle_Roll = ViewModel_Angle_Roll + 0.001
+	end
 end
 
 function SWEP:Cast( spell )
@@ -255,5 +257,7 @@ end
 -- Base function for any spells which have their own logic
 function SWEP:Cast_Misc( spell )
 	local spell, angle = spell:Create( self.Owner, self.Owner:GetPos() )
-	spell.Owner = self.Owner
+	if ( spell ) then
+		spell.Owner = self.Owner
+	end
 end

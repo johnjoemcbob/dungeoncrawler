@@ -21,6 +21,7 @@ local plymeta = FindMetaTable( "Player" );
 function plymeta:AddBuff( id )
 	if ( id <= 0 ) then return end
 	if ( self.Ghost ) then return end
+	if ( not self.Buffs ) then self.Buffs = {} end
 
 	-- If the buff doesn't exist currently on the player, initialize it
 	if ( not self:GetBuff( id ) ) then
@@ -36,6 +37,7 @@ end
 
 function plymeta:RemoveBuff( id )
 	if ( id <= 0 ) then return end
+	if ( not self.Buffs ) then self.Buffs = {} end
 
 	-- Run the cleanup logic of this buff on the player
 	if ( self:GetBuff( id ) ) then
@@ -50,7 +52,7 @@ function plymeta:RemoveBuff( id )
 end
 
 function plymeta:GetBuff( id )
-	if ( not self.Buffs ) then return nil end
+	if ( not self.Buffs ) then self.Buffs = {} end
 	return self.Buffs[id]
 end
 

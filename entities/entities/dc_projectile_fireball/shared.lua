@@ -157,5 +157,6 @@ function ENT:IsSpell()
 end
 
 function ENT:Team()
+	if ( not self.Owner or ( not self.Owner.Team ) ) then return 0 end
 	return self.Owner:Team()
 end

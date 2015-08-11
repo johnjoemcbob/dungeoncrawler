@@ -6,7 +6,7 @@
 ENT.Radius = 350
 
 -- The damage to inflict if this spell affects a player
-ENT.Damage = 50
+ENT.Damage = 30
 
 -- The extra amount of height which can be added/removed from a groundpound if the player launches from atop something or in a ditch
 ENT.ExtraHeight = 150

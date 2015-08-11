@@ -22,6 +22,46 @@ end
 include( "shared.lua" )
 include( "sv_buff.lua" )
 
+-- Sends to cl_hud.lua
+util.AddNetworkString( "DC_Client_Round" )
+
+local LastRoundInfo = {}
+function SendClientRoundInformation( textenum, endtime )
+	for k, ply in pairs( player.GetAll() ) do
+		if ( ply.MessagesReceived ) then
+			ply.MessagesReceived["DC_Client_Round"] = nil
+		end
+	end
+
+	-- Store last message sent
+	LastRoundInfo.Text = textenum
+	LastRoundInfo.Time = CurTime() + endtime
+
+	-- Send the round information enum (can be looked up within shared.lua)
+	net.Start( "DC_Client_Round" )
+		net.WriteFloat( textenum )
+		net.WriteFloat( endtime )
+	net.Broadcast()
+
+	-- Resend this information if it hasn't been replied to
+	if ( not timer.Exists( "DC_Client_Round" ) ) then
+		timer.Create( "DC_Client_Round", 0.5, 1, function()
+			for k, ply in pairs( player.GetAll() ) do
+				if ( ( not ply.MessagesReceived ) or ( not ply.MessagesReceived["DC_Client_Round"] ) ) then
+					-- Repeat until the client receives it
+					SendClientRoundInformation( LastRoundInfo.Text, LastRoundInfo.Time - CurTime() )
+				end
+			end
+		end )
+	end
+end
+net.Receive( "DC_Client_Round", function( len, ply )
+	if ( not ply.MessagesReceived ) then
+		ply.MessagesReceived = {}
+	end
+	ply.MessagesReceived["DC_Client_Round"] = true
+end )
+
 function GM:Initialize()
 	self.BaseClass:Initialize()
 end
@@ -88,6 +128,11 @@ function GM:PlayerInitialSpawn( ply )
 		end
 	end
 
+	-- If last round send info is still valid, send that to the new player
+	if ( LastRoundInfo.Time and ( CurTime() < LastRoundInfo.Time ) ) then
+		SendClientRoundInformation( LastRoundInfo.Text, LastRoundInfo.Time - CurTime() )
+	end
+
 	-- Used to initialize the player buff table, function located within sv_buff.lua
 	self:PlayerInitialSpawn_Buff( ply )
 end
@@ -146,29 +191,16 @@ function GM:CheckEndConditions()
 			end
 		end
 	if ( not livingplayers ) then
-		self:RoundEndWithResult( TEAM_MONSTER, "MONSTER WIN\nHeroes annihilated!" )
+		self:RoundEndWithResult( TEAM_MONSTER, ROUNDTEXT_WIN_MONSTER )
 	end
 
 	if ( not self.ControlPoints[#self.ControlPoints].Entity.MonsterControlled ) then
-		self:RoundEndWithResult( TEAM_HERO, "HERO WIN\nLand reclaimed!" )
+		self:RoundEndWithResult( TEAM_HERO, ROUNDTEXT_WIN_HERO )
 	end
 end
 
 -- Overwrite to not respawn all important map items after cleaning up the map
 function GM:OnPreRoundStart( num )
-	-- Cleanup and then spawn all gamemode map items again (e.g. checkpoints)
-	game.CleanUpMap()
-	self:SpawnMapItems()
-
-	-- Send the reset captured state of every control point to every player
-	for k, ply in pairs( player.GetAll() ) do
-		for m, point in pairs( self.ControlPoints ) do
-			if ( point.Entity and IsValid( point.Entity ) ) then
-				point.Entity:SendClientInformation_Capture( ply )
-			end
-		end
-	end
-
 	-- Reset round logic
 	for k, ply in pairs( player.GetAll() ) do
 		ply.Ghost = nil
@@ -182,19 +214,44 @@ function GM:OnPreRoundStart( num )
 		for k, v in pairs( player.GetAll() ) do
 			SendClientGhostInformation( v, ply )
 		end
+
+		-- Remove players from any trigger zones they were in
+		if ( ply.TriggerZone and IsValid( ply.TriggerZone ) ) then
+			ply.TriggerZone:RemovePlayer( ply )
+		end
+	end
+
+	-- Cleanup and then spawn all gamemode map items again (e.g. checkpoints)
+	-- NOTE: Must be after other reset logic as some of the resetting requires that the old entities exist
+	game.CleanUpMap()
+	self:SpawnMapItems()
+
+	-- Send the reset captured state of every control point to every player
+	for k, ply in pairs( player.GetAll() ) do
+		for m, point in pairs( self.ControlPoints ) do
+			if ( point.Entity and IsValid( point.Entity ) ) then
+				point.Entity:SendClientInformation_Capture( ply )
+			end
+		end
 	end
 
 	UTIL_StripAllPlayers()
 	UTIL_SpawnAllPlayers()
 	UTIL_FreezeAllPlayers()
+
+	SendClientRoundInformation( ROUNDTEXT_PRE, self.RoundPreStartTime )
 end
 
 function GM:OnRoundStart( num )
 	self.BaseClass:OnRoundStart()
+
+	SendClientRoundInformation( ROUNDTEXT_BEGIN, 3 )
 end
 
 function GM:OnRoundResult( result, resulttext )
 	team.AddScore( result, 1 )
+
+	SendClientRoundInformation( tonumber( resulttext ), self.RoundPostLength )
 end
 
 -- Don't kill players if they are standing on the spawn point, some maps (i.e. rp_harmonti) only have one spawn

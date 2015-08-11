@@ -15,5 +15,5 @@ GM.Spells["dc_touch_physical"] =
 	end,
 	Range = 50,
 	Radius = 50,
-	Damage = 5
+	Damage = 20
 }

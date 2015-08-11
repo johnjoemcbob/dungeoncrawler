@@ -25,6 +25,24 @@ net.Receive( "DC_Client_ControlPoint", function( len )
 	}
 end )
 
+-- Initialization of this message is contained within init.lua
+net.Receive( "DC_Client_Round", function( len )
+	local textenum = math.Round( net.ReadFloat() )
+	local timer = net.ReadFloat()
+
+	-- Store the round information on the player for rendering
+	LocalPlayer().Round = {
+		Enum = textenum,
+		Time = CurTime() + timer
+	}
+
+	-- Send received confirmation
+	net.Start( "DC_Client_Round" )
+		net.WriteFloat( 0 )
+		net.WriteFloat( 0 )
+	net.SendToServer()
+end )
+
 -- Initialization of this message is contained within dc_trigger_control/shared.lua
 -- NOTE: Isn't JUST sent after capture, is also used on new players to update them on the
 -- either monstercontrolled/not
@@ -120,6 +138,9 @@ function GM:HUDPaint()
 	-- Control point information
 	self:HUDPaint_ControlPoint_Overall()
 	self:HUDPaint_ControlPoint_Current()
+
+	-- Round information
+	self:HUDPaint_Round()
 end
 
 -- Display health
@@ -283,7 +304,7 @@ function GM:HUDPaint_ControlPoint_Overall()
 				surface.SetDrawColor( 0, 0, 255, 200 )
 			end
 			draw.NoTexture()
-			draw.Circle( x + ( width * v.Position.x ), y + ( height * v.Position.y ), radius, 25 )
+			draw.Circle( x + ( width * v.Position.x ), y + math.abs( Minimap.Y.min ) - ( height * v.Position.y ), radius, 25 )
 		end
 
 		-- Player's position in the world
@@ -293,17 +314,13 @@ function GM:HUDPaint_ControlPoint_Overall()
 			plyy = ( plyy + math.abs( Minimap.Y.min ) ) / Minimap.Y.dif
 		surface.SetDrawColor( 50, 50, 255, 200 )
 		draw.NoTexture()
-		draw.Circle( x + ( width * plyx ), y + ( height * plyy ), radius / 2, 5 )
+		draw.Circle( x + ( width * plyx ), y + math.abs( Minimap.Y.min ) - ( height * plyy ), radius / 2, 5 )
 	end
 end
 
 -- Display information about the current control point, such as name and capture progress
 function GM:HUDPaint_ControlPoint_Current()
 	if ( not LocalPlayer().ControlPoint ) then return end
-
-	-- Display the name of this point
-	local textcolour = Color( 255, 255, 255, 255 )
-	draw.DrawText( LocalPlayer().ControlPoint.Name, "TargetID", ScrW() * 0.5, ScrH() * 0.01, textcolour, TEXT_ALIGN_CENTER )
 
 	-- Skip to the right value if too far out
 	if ( math.abs( LocalPlayer().ControlPoint.Progress - Progress ) > 50 ) then
@@ -328,6 +345,48 @@ function GM:HUDPaint_ControlPoint_Current()
 		( ScrW() * 0.5 ) - ( width / 2 ), ( ScrH() * 0.01 ) - ( height / 2 ),
 		width, height,
 		progresscolour
+	)
+
+	-- Display the name of this point
+	local textcolour = Color( 255, 255, 255, 255 )
+	draw.DrawText( LocalPlayer().ControlPoint.Name, "TargetID", ScrW() * 0.5, ScrH() * 0.01, textcolour, TEXT_ALIGN_CENTER )
+end
+
+-- Display information about the current round status
+function GM:HUDPaint_Round()
+	if ( not LocalPlayer().Round ) then return end
+	if ( CurTime() > LocalPlayer().Round.Time ) then return end
+
+	-- Get the text format information
+	local roundtextformat = GAMEMODE.RoundText[LocalPlayer().Round.Enum]
+
+	-- Get the height of the text for centering
+	surface.SetFont( roundtextformat.Font )
+	local textwidth, size = surface.GetTextSize( roundtextformat.Text )
+	local _, averagesize = surface.GetTextSize( "TEST" )
+	size = size - averagesize
+
+	-- Backdrop of this text
+	local colour = roundtextformat.BackdropColour
+	local x = ( ScrW() * 0.5 )
+	local y = ( ScrH() * 0.1 )
+	local width =  textwidth + ( ScrW() * 0.05 )
+	local height = ScrH() * 0.1
+	draw.RoundedBox(
+		0,
+		x - ( width / 2 ), y - ( height / 2 ),
+		width, height + size,
+		colour
+	)
+
+	-- Display the current round status
+	local textcolour = roundtextformat.TextColour
+	draw.DrawText(
+		string.format( roundtextformat.Text, math.Round( LocalPlayer().Round.Time - CurTime() ) ),
+		roundtextformat.Font,
+		x, y - ( height / 4 ),
+		textcolour,
+		TEXT_ALIGN_CENTER
 	)
 end
 
