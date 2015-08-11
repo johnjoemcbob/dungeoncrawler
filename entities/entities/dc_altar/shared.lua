@@ -30,7 +30,10 @@ ENT.Active = false
 ENT.HornsIgnited = false
 ENT.PlayersInRange = {}
 ENT.PlayerMenuTime = 0
-ENT.AnimStage = 0
+ENT.AnimStage = 0 
+ENT.MenuOpened = 0
+ENT.SpellCardModels = {}
+
 
 function ENT:Initialize()
 	-- Set own model for table.
@@ -101,7 +104,7 @@ function ENT:CheckHeroes()
 	end
 	
 	if( CLIENT ) then 
-		if(LocalPlayer():GetPos():Distance(self:GetPos()) < self.Radius) then
+		if(LocalPlayer():GetPos():Distance(self:GetPos()) < self.Radius && LocalPlayer():Team() == TEAM_HERO) then
 			LocalPlayer().CurrentAltar = self
 		end
 	end
@@ -131,20 +134,32 @@ function ENT:OpenMenu()
 			-- Increment animation timer
 			self.PlayerMenuTime = self.PlayerMenuTime + 1
 			
+			
 			if(self.PlayerMenuTime >= 300) then
 				self.PlayerMenuTime = 300
 			end
 			
 			
 			-- Get list of available spells -- GM.Spells!
-			
-			-- Check animation stage and render accordingly, rendering a card for each spell
-			if(self.AnimStage == 0) then
-				-- Stage 1: Cards are face-down, and rotate up to face the viewer.
-					--for k, v in pairs( GM.Spells ) do
-						-- Draw card per spell	(separate 3D2D calls? individual card rotations that way)								
-						self:Draw3D2DCard(0, 0, self.PlayerMenuTime / 300 * -90)
-				--end
+			if(self.MenuOpened == 0) then
+				local spellnum = 0
+				for k, v in pairs(GAMEMODE.Spells) do
+					local cardmodel = ClientsideModel(	"models/props_c17/Frame002a.mdl", RENDERGROUP_BOTH )
+					cardmodel:SetPos(self:GetPos() + self:GetAngles():Up() * 35)
+
+					print(spellnum)
+					cardmodel:SetAngles(self:GetAngles() + Angle(-90, 0, 0))
+					cardmodel:SetModelScale(0.25, 0)
+					spellnum = spellnum + 1
+					table.insert(self.SpellCardModels, cardmodel )
+					
+				end
+				self.MenuOpened = 1
+			end
+			local i = 1
+			for k, v in pairs(GAMEMODE.Spells) do
+				self:DrawSpellCard(self.SpellCardModels[i], v, i, 0)
+				i = i + 1
 			end
 			
 			
@@ -157,6 +172,15 @@ function ENT:OpenMenu()
 	
 		else
 			self.PlayerMenuTime = 0
+			self.MenuOpened = 0
+			-- Delete spell cards
+			for k, v in pairs(self.SpellCardModels) do
+				if(IsValid(v)) then
+					v:Remove()
+				end
+			end
+			self.SpellCardModels = {}
+
 		end
 	end
 end
@@ -166,41 +190,14 @@ end
 --	IT'S A DISGRACE, DON'T LOOK
 --==============================
 
-function ENT:Draw3D2DCard(cardnum, cardinfo, rotamt)
+function ENT:DrawSpellCard(cardmodel, cardinfo, cardnum, rotamt)
 
 	if( CLIENT ) then
-		if(cardnum == nil) then
-			cardnum = 0
-		end
-
-		
-		if(rotamt > -45) then
-			-- Front-Side of Spell Card
-			cam.Start3D2D( self:GetPos() + self:GetAngles():Up() * 35 + (Vector( 0, -rotamt / 15,  rotamt / 35 ) * self:GetAngles():Forward()) + (self:GetAngles():Up() * (math.sin(CurTime()))), self:GetAngles() + Angle( 180 + rotamt, 0, 0 ), 1 )
-				surface.SetDrawColor( Color( 255, 255, 255, 255 ))
-				surface.DrawRect(0, 0+cardnum*16, -15, 7)
-			cam.End3D2D()
-			
-			-- Back-Side of Spell Card
-			cam.Start3D2D( self:GetPos() + self:GetAngles():Up() * 35.1 +(Vector( 0, -rotamt / 14.8,  rotamt / 35 ) * self:GetAngles():Forward())  + (self:GetAngles():Up() * (math.sin(CurTime()))) , self:GetAngles() + Angle( 0 + rotamt, 0, 0 ), 1 )
-				surface.SetDrawColor( Color( math.sin(CurTime() / 0.70) * 100 + 100, 25, math.cos(CurTime() / 0.75) * 100 + 100, 255 ) )	
-				surface.DrawRect(0, 0+cardnum*16, 15, 7)
-			cam.End3D2D()		
-		else
-
-			
-			-- Back-Side of Spell Card
-			cam.Start3D2D( self:GetPos() + self:GetAngles():Up() * 35.1 + (Vector( 0, -rotamt / 14.8,  rotamt / 35 ) * self:GetAngles():Forward())  + (self:GetAngles():Up() * (math.sin(CurTime()))) , self:GetAngles() + Angle( 0 + rotamt, 0, 0 ), 1 )
-				surface.SetDrawColor( Color( math.sin(CurTime() / 0.70) * 100 + 100, 25, math.cos(CurTime() / 0.75) * 100 + 100, 255 ) )	
-				surface.DrawRect(0, 0+cardnum*16, 15, 7)
-			cam.End3D2D()	
-			
-			-- Front-Side of Spell Card
-			cam.Start3D2D( self:GetPos() + self:GetAngles():Up() * 35 + (Vector( 0, -rotamt / 15,  rotamt / 35 ) * self:GetAngles():Forward())  + (self:GetAngles():Up() * (math.sin(CurTime()))), self:GetAngles() + Angle( 180 + rotamt, 0, 0 ), 1 )
-				surface.SetDrawColor( Color( 255, 255, 255, 255 ))
-				surface.DrawRect(0, 0+cardnum*16, -15, 7)
-			cam.End3D2D()
-		end
+		if(cardinfo != nil) then
+			-- rotation / movement / floating stuff
+			cardmodel:SetPos(self:GetPos() + (self:GetAngles():Up() * (35 + math.sin(CurTime()) * 5)))
+			cardmodel:SetPos(cardmodel:GetPos() + (self:GetAngles():Right() * cardnum * 15))
+		end			
 	end
 	
 
@@ -221,23 +218,17 @@ function ENT:Think()
 		end
 	end
 
-
+	
+	if( CLIENT ) then
+		if(LocalPlayer().CurrentAltar == self) then
+			self:OpenMenu()
+		end
+	end
 
 end
 
 function ENT:Draw()
 	self:DrawModel()
-	
+
 
 end
-
--- Hook for 3D2D
-hook.Add( "PostDrawOpaqueRenderables", "AltarMenu", function()
-	
-	local altar = LocalPlayer().CurrentAltar
-	if(altar != nil && IsValid(altar)) then
-		altar:OpenMenu()
-	end
-	
-	
-end )
