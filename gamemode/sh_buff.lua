@@ -77,6 +77,8 @@ table.insert(
 			return false
 		end,
 		Init = function( self, ply )
+			ply.OldWalkSpeed = ply:GetWalkSpeed()
+			ply.OldRunSpeed = ply:GetWalkSpeed()
 			ply:SetWalkSpeed( ply:GetWalkSpeed() / 2 )
 			ply:SetRunSpeed( ply:GetRunSpeed() / 2 )
 		end,
@@ -84,8 +86,8 @@ table.insert(
 			
 		end,
 		Remove = function( self, ply )
-			ply:SetWalkSpeed( ply:GetWalkSpeed() * 2 )
-			ply:SetRunSpeed( ply:GetRunSpeed() * 2 )
+			ply:SetWalkSpeed( ply.OldWalkSpeed )
+			ply:SetRunSpeed( ply.OldRunSpeed )
 		end
 	}
 )

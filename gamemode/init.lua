@@ -277,6 +277,24 @@ function GM:IsSpawnpointSuitable( ply, spawnpointent, bMakeSuitable )
 	return true
 end
 
+-- Overwrite base fretta logic here to cap the amount of heroes at 4
+function GM:PlayerRequestTeam( ply, teamid )
+	if ( teamid == TEAM_HERO ) then
+		local count = 0
+			for k, v in pairs ( player.GetAll() ) do
+				if ( v:Team() == TEAM_HERO ) then
+					count = count + 1
+				end
+			end
+		if ( count >= 4 ) then
+			ply:ChatPrint( "Heroes team full, spawning as a monster" )
+			return self.BaseClass:PlayerRequestTeam( ply, TEAM_MONSTER )
+		end
+	end
+
+	return self.BaseClass:PlayerRequestTeam( ply, teamid )
+end
+
 hook.Add( "PlayerSpawn", "DC_PlayerSpawn_HandsSetup", function( ply )
 	ply:SetupHands() -- Create the hands view model and call GM:PlayerSetHandsModel
 end )

@@ -304,7 +304,7 @@ function GM:HUDPaint_ControlPoint_Overall()
 				surface.SetDrawColor( 0, 0, 255, 200 )
 			end
 			draw.NoTexture()
-			draw.Circle( x + ( width * v.Position.x ), y + math.abs( Minimap.Y.min ) - ( height * v.Position.y ), radius, 25 )
+			draw.Circle( x + ( width * v.Position.x ), y + height - ( height * v.Position.y ), radius, 25 )
 		end
 
 		-- Player's position in the world
@@ -314,7 +314,7 @@ function GM:HUDPaint_ControlPoint_Overall()
 			plyy = ( plyy + math.abs( Minimap.Y.min ) ) / Minimap.Y.dif
 		surface.SetDrawColor( 50, 50, 255, 200 )
 		draw.NoTexture()
-		draw.Circle( x + ( width * plyx ), y + math.abs( Minimap.Y.min ) - ( height * plyy ), radius / 2, 5 )
+		draw.Circle( x + ( width * plyx ), y + height - ( height * plyy ), radius / 2, 5 )
 	end
 end
 

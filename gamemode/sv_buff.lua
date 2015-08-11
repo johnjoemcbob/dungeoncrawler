@@ -41,7 +41,7 @@ function plymeta:RemoveBuff( id )
 
 	-- Run the cleanup logic of this buff on the player
 	if ( self:GetBuff( id ) ) then
-		GAMEMODE.Buffs[id]:Remove( ply )
+		GAMEMODE.Buffs[id]:Remove( self )
 	end
 
 	-- Flag as not affecting this player
