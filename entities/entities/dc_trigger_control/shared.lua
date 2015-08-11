@@ -138,7 +138,7 @@ if SERVER then
 		ply.TriggerZone = self
 
 		-- Check for capture ability against the changed number of contained players
-		self:CompairTeamNumbers()
+		self:CompareTeamNumbers()
 
 		-- Send first information about this point to the new player
 		self:SendClientInformation_Inside( ply )
@@ -154,13 +154,13 @@ if SERVER then
 		end
 
 		-- Check for capture ability against the changed number of contained players
-		self:CompairTeamNumbers()
+		self:CompareTeamNumbers()
 	end
 
 	-- Function to compare the number of heroes and monsters inside the zone,
 	-- to decide if it can be captured
 	-- NOTE: Flags ENT.TeamCapturing to allow ENT:Think to run capturing logic
-	function ENT:CompairTeamNumbers()
+	function ENT:CompareTeamNumbers()
 		local capture = TEAM_NONE
 			local heroes = false
 			local monsters = false
