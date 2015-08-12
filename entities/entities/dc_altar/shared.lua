@@ -35,6 +35,8 @@ ENT.AnimStage = 0
 ENT.MenuOpened = 0
 ENT.SpellCardModels = {}
 ENT.TotalKnownSpells = 0
+ENT.NextParticle = 0
+ENT.BetweenParticle = 0.5
 
 
 function ENT:Initialize()
@@ -106,7 +108,7 @@ function ENT:CheckHeroes()
 	end
 	
 	if( CLIENT ) then 
-		if(LocalPlayer():GetPos():Distance(self:GetPos()) < self.Radius && LocalPlayer():Team() == TEAM_HERO) then
+		if(LocalPlayer():GetPos():Distance(self:GetPos()) < self.Radius * 1.5 && LocalPlayer():Team() == TEAM_HERO) then
 			LocalPlayer().CurrentAltar = self
 		end
 	end
@@ -190,6 +192,7 @@ function ENT:OpenMenu()
 			end
 			self.SpellCardModels = {}
 
+			LocalPlayer().CurrentAltar = nil
 		end
 	end
 end
@@ -229,6 +232,15 @@ function ENT:Think()
 	if( CLIENT ) then
 		if(LocalPlayer().CurrentAltar == self) then
 			self:OpenMenu()
+
+			-- Display particle effects when the player is near
+			if ( CurTime() > self.NextParticle ) then
+				local effectdata = EffectData()
+					effectdata:SetOrigin( self:GetPos() + Vector( 0, 0, 28 ) )
+					effectdata:SetAngles( self:GetAngles() )
+				rain = util.Effect( "dc_spellaltar", effectdata, true, true )
+				self.NextParticle = CurTime() + self.BetweenParticle
+			end
 		end
 	end
 

@@ -145,6 +145,9 @@ if SERVER then
 	end
 
 	function ENT:RemovePlayer( ply )
+		-- Guard against removing the player when they disconnected as server host, and no longer exist
+		if ( not ply ) then return end
+
 		self.PlayersContained[ply:EntIndex()] = nil
 
 		-- Remove this zone from the player for clientside visuals
