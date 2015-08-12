@@ -72,19 +72,21 @@ end
 
 function GM:SpawnMapItems()
 	-- Load trigger positions and other data from sh_controlpoints.lua
-	for k, v in pairs( self.ControlPoints ) do
-		v.Entity = ents.Create( "dc_trigger_control" )
-			v.Entity:SetPos( v.Position )
-			v.Entity.StartPos = v.Start
-			v.Entity.EndPos = v.End
-			v.Entity.ID = k
-			v.Entity.ZoneName = v.Title
-			v.Entity.Type = v.Type
-			v.Entity.CaptureSpeed = v.CaptureSpeed
-			if ( v.PrecedingPoint >= 1 ) then
-				v.Entity.PrecedingPoint = self.ControlPoints[v.PrecedingPoint].Entity
-			end
-		v.Entity:Spawn()
+	if ( self.ControlPoints[game.GetMap()] ) then
+		for k, v in pairs( self.ControlPoints[game.GetMap()] ) do
+			v.Entity = ents.Create( "dc_trigger_control" )
+				v.Entity:SetPos( v.Position )
+				v.Entity.StartPos = v.Start
+				v.Entity.EndPos = v.End
+				v.Entity.ID = k
+				v.Entity.ZoneName = v.Title
+				v.Entity.Type = v.Type
+				v.Entity.CaptureSpeed = v.CaptureSpeed
+				if ( v.PrecedingPoint >= 1 ) then
+					v.Entity.PrecedingPoint = self.ControlPoints[game.GetMap()][v.PrecedingPoint].Entity
+				end
+			v.Entity:Spawn()
+		end
 	end
 
 	-- Spawn spell altars on the map
@@ -115,9 +117,11 @@ function GM:PlayerInitialSpawn( ply )
 	self.BaseClass:PlayerInitialSpawn( ply )
 
 	-- Send captured state of every control point to the new player
-	for k, point in pairs( self.ControlPoints ) do
-		if ( point.Entity and IsValid( point.Entity ) ) then
-			point.Entity:SendClientInformation_Capture( ply )
+	if ( self.ControlPoints[game.GetMap()] ) then
+		for k, point in pairs( self.ControlPoints[game.GetMap()] ) do
+			if ( point.Entity and IsValid( point.Entity ) ) then
+				point.Entity:SendClientInformation_Capture( ply )
+			end
 		end
 	end
 
@@ -194,8 +198,10 @@ function GM:CheckEndConditions()
 		self:RoundEndWithResult( TEAM_MONSTER, ROUNDTEXT_WIN_MONSTER )
 	end
 
-	if ( not self.ControlPoints[#self.ControlPoints].Entity.MonsterControlled ) then
-		self:RoundEndWithResult( TEAM_HERO, ROUNDTEXT_WIN_HERO )
+	if ( self.ControlPoints[game.GetMap()] ) then
+		if ( not self.ControlPoints[game.GetMap()][#self.ControlPoints[game.GetMap()]].Entity.MonsterControlled ) then
+			self:RoundEndWithResult( TEAM_HERO, ROUNDTEXT_WIN_HERO )
+		end
 	end
 end
 
@@ -227,10 +233,12 @@ function GM:OnPreRoundStart( num )
 	self:SpawnMapItems()
 
 	-- Send the reset captured state of every control point to every player
-	for k, ply in pairs( player.GetAll() ) do
-		for m, point in pairs( self.ControlPoints ) do
-			if ( point.Entity and IsValid( point.Entity ) ) then
-				point.Entity:SendClientInformation_Capture( ply )
+	if ( self.ControlPoints[game.GetMap()] ) then
+		for k, ply in pairs( player.GetAll() ) do
+			for m, point in pairs( self.ControlPoints[game.GetMap()] ) do
+				if ( point.Entity and IsValid( point.Entity ) ) then
+					point.Entity:SendClientInformation_Capture( ply )
+				end
 			end
 		end
 	end

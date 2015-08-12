@@ -5,9 +5,6 @@
 -- The currently displayed progress amount, which is lerped as new information is received
 local Progress = 0
 
--- The table of information about the control point minimap
-local Minimap = {}
-
 -- Initialization of this message is contained within hero.lua
 net.Receive( "DC_Client_Spells", function( len )
 	LocalPlayer().Spells = {
@@ -47,13 +44,15 @@ end )
 -- NOTE: Isn't JUST sent after capture, is also used on new players to update them on the
 -- either monstercontrolled/not
 net.Receive( "DC_Client_ControlPoint_Capture", function( len )
-	if ( Minimap.Points ) then
+	if ( LocalPlayer().Minimap and LocalPlayer().Minimap.Points ) then
 		local id = math.Round( net.ReadFloat() )
-		Minimap.Points[id].MonsterControlled = net.ReadBit() == 1
+		LocalPlayer().Minimap.Points[id].MonsterControlled = net.ReadBit() == 1
 	end
 end )
 
-function GM:Initialize_HUD()
+function GM:InitPostEntity_HUD()
+	if ( not self.ControlPoints[game.GetMap()] ) then return end
+
 	-- First find the size of the map needed to represent the control points
 	local x = {
 		min = nil,
@@ -63,7 +62,7 @@ function GM:Initialize_HUD()
 		min = nil,
 		max = nil
 	}
-	for k, v in pairs( self.ControlPoints ) do
+	for k, v in pairs( self.ControlPoints[game.GetMap()] ) do
 		if ( ( not x.min ) or ( v.Position.x < x.min ) ) then
 			x.min = v.Position.x
 		end
@@ -87,26 +86,38 @@ function GM:Initialize_HUD()
 	y.max = y.max + ( height / 10 )
 
 	-- Fill the size information into the table
-	Minimap.X = {}
-		Minimap.X.min = x.min
-		Minimap.X.max = x.max
-		Minimap.X.dif = math.Distance( x.min, 0, x.max, 0 )
-	Minimap.Y = {}
-		Minimap.Y.min = y.min
-		Minimap.Y.max = y.max
-		Minimap.Y.dif = math.Distance( y.min, 0, y.max, 0 )
+	LocalPlayer().Minimap = {}
+	LocalPlayer().Minimap.X = {}
+		LocalPlayer().Minimap.X.min = x.min
+		LocalPlayer().Minimap.X.max = x.max
+		LocalPlayer().Minimap.X.dif = math.Distance( x.min, 0, x.max, 0 )
+	LocalPlayer().Minimap.Y = {}
+		LocalPlayer().Minimap.Y.min = y.min
+		LocalPlayer().Minimap.Y.max = y.max
+		LocalPlayer().Minimap.Y.dif = math.Distance( y.min, 0, y.max, 0 )
 
 	-- Store the normalized control point positions for displaying
-	Minimap.Points = {}
-	for k, v in pairs( self.ControlPoints ) do
-		table.insert( Minimap.Points, {
+	LocalPlayer().Minimap.Points = {}
+	for k, v in pairs( self.ControlPoints[game.GetMap()] ) do
+		table.insert( LocalPlayer().Minimap.Points, {
 			Title = v.Title,
 			Position = {
-				x = ( v.Position.x + math.abs( x.min ) ) / Minimap.X.dif,
-				y = ( v.Position.y + math.abs( y.min ) ) / Minimap.Y.dif,
+				x = ( v.Position.x + math.abs( x.min ) ) / LocalPlayer().Minimap.X.dif,
+				y = ( v.Position.y + math.abs( y.min ) ) / LocalPlayer().Minimap.Y.dif
 			},
 			MonsterControlled = true
 		} )
+
+		-- Normalize path positions
+		if ( v.Path ) then
+			LocalPlayer().Minimap.Points[k].Path = {}
+			for m, path in pairs( v.Path ) do
+				LocalPlayer().Minimap.Points[k].Path[m] = Vector(
+					( path.x + math.abs( x.min ) ) / LocalPlayer().Minimap.X.dif,
+					( path.y + math.abs( y.min ) ) / LocalPlayer().Minimap.Y.dif
+				)
+			end
+		end
 	end
 
 	-- Create a material cache for each icon
@@ -289,32 +300,98 @@ end
 function GM:HUDPaint_ControlPoint_Overall()
 	-- Calculate the coordinates to display at, depending on the users resolution
 	-- (the control point positions are normalized on initialization)
-	local width = ScrW() / 10
-	local height = ScrH() / 10
-	local x = ( ScrW() / 2 ) - ( width / 2 )
+	local width = ScrW() / 8
+	local height = ScrH() / 8
+	local x = ( height / 2 )
 	local y = ( height / 2 )
-	local radius = width / 5
+	local radius = width / 14
+	local pathradius = radius / 4
+	local playerradius = radius / 3
 
 	-- Display the map
-	if ( Minimap.Points ) then
-		for k, v in pairs( Minimap.Points ) do
+	if ( LocalPlayer().Minimap and LocalPlayer().Minimap.Points ) then
+		-- Draw control point borders
+		for k, v in pairs( LocalPlayer().Minimap.Points ) do
+			draw.NoTexture()
+
+			surface.SetDrawColor( 0, 0, 0, 255 )
+			draw.Circle( x + ( width * v.Position.x ), y + height - ( height * v.Position.y ), radius, 25 )
+		end
+		-- Draw paths between the control points
+		for k, v in pairs( LocalPlayer().Minimap.Points ) do
 			if ( v.MonsterControlled ) then
 				surface.SetDrawColor( 255, 0, 0, 200 )
 			else
 				surface.SetDrawColor( 0, 0, 255, 200 )
 			end
+
+			if ( self.ControlPoints[game.GetMap()][k].PrecedingPoint > 0 ) then
+				local preceding = LocalPlayer().Minimap.Points[self.ControlPoints[game.GetMap()][k].PrecedingPoint]
+				-- Draw more detailed path
+				if ( v.Path ) then
+					local lastpoint = Vector( v.Position.x, v.Position.y )
+					for k, path in pairs( v.Path ) do
+						surface.DrawLine(
+							x + ( width * lastpoint.x ), y + height - ( height * lastpoint.y ),
+							x + ( width * path.x ), y + height - ( height * path.y )
+						)
+						draw.NoTexture()
+						draw.Circle( x + ( width * path.x ), y + height - ( height * path.y ), pathradius, 25 )
+						lastpoint = path
+					end
+					surface.DrawLine(
+						x + ( width * preceding.Position.x ), y + height - ( height * preceding.Position.y ),
+						x + ( width * lastpoint.x ), y + height - ( height * lastpoint.y )
+					)
+				-- Draw straight line path
+				else
+					surface.DrawLine(
+						x + ( width * preceding.Position.x ), y + height - ( height * preceding.Position.y ),
+						x + ( width * v.Position.x ), y + height - ( height * v.Position.y )
+					)
+				end
+			end
+		end
+		-- Draw control points
+		for k, v in pairs( LocalPlayer().Minimap.Points ) do
 			draw.NoTexture()
-			draw.Circle( x + ( width * v.Position.x ), y + height - ( height * v.Position.y ), radius, 25 )
+
+			if ( v.MonsterControlled ) then
+				surface.SetDrawColor( 255, 0, 0, 255 )
+			else
+				surface.SetDrawColor( 0, 0, 255, 255 )
+			end
+
+			-- Display the number of this point, or a B for bonus
+			local text = self.ControlPoints[game.GetMap()][k].PrecedingPoint
+				if ( not text ) then
+					text = "B"
+				else
+					text = text + 1
+				end
+			local cx = x + ( width * v.Position.x )
+			local cy = y + height - ( height * v.Position.y )
+			draw.Circle( cx, cy, radius * 0.8, 25 )
+			draw.SimpleText( text, "Default", cx, cy, Color( 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 		end
 
 		-- Player's position in the world
 		local plyx = LocalPlayer():GetPos().x
 		local plyy = LocalPlayer():GetPos().y
-			plyx = ( plyx + math.abs( Minimap.X.min ) ) / Minimap.X.dif
-			plyy = ( plyy + math.abs( Minimap.Y.min ) ) / Minimap.Y.dif
-		surface.SetDrawColor( 50, 50, 255, 200 )
+			-- Normalize position
+			plyx = ( plyx + math.abs( LocalPlayer().Minimap.X.min ) ) / LocalPlayer().Minimap.X.dif
+			plyy = ( plyy + math.abs( LocalPlayer().Minimap.Y.min ) ) / LocalPlayer().Minimap.Y.dif
+			-- Scale up to minimap position
+			plyx = x + ( width * plyx )
+			plyy = y + height - ( height * plyy )
 		draw.NoTexture()
-		draw.Circle( x + ( width * plyx ), y + height - ( height * plyy ), radius / 2, 5 )
+		surface.SetDrawColor( 0, 0, 0, 255 )
+		draw.Circle( plyx, plyy, playerradius, 12 )
+		surface.SetDrawColor( 100, 100, 255, 255 )
+			if ( LocalPlayer():Team() == TEAM_MONSTER ) then
+				surface.SetDrawColor( 255, 100, 100, 255 )
+			end
+		draw.Circle( plyx, plyy, playerradius * 0.8, 12 )
 	end
 end
 

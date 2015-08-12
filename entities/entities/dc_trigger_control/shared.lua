@@ -65,7 +65,7 @@ function ENT:Initialize()
 		self:SetTrigger( true )
 		self:SetMoveType( MOVETYPE_NONE )
 		self:SetSolid( SOLID_BBOX )
-		self:SetCollisionBoundsWS( self.StartPos, self.EndPos )
+		self:SetCollisionBounds( self.StartPos, self.EndPos )
 		self:SetCollisionGroup( COLLISION_GROUP_IN_VEHICLE )
 
 		self.PlayersContained = {}
@@ -166,7 +166,7 @@ if SERVER then
 			local monsters = false
 			for k, ply in pairs( self.PlayersContained ) do
 				if ( ( ply:Team() == TEAM_HERO ) and ( not ply.Ghost ) ) then
-					heroes = true
+					heroes = ( heroes or 0 ) + 1
 				elseif ( ply:Team() == TEAM_MONSTER ) then
 					monsters = true
 				end
@@ -174,6 +174,7 @@ if SERVER then
 			-- Heroes are present and monsters aren't, capture
 			if ( heroes and ( not monsters ) ) then
 				capture = TEAM_HERO
+				self.HeroesPresent = heroes
 			end
 			-- Monsters are present and heroes aren't, capture
 			if ( monsters and ( not heroes ) ) then
@@ -195,7 +196,7 @@ if SERVER then
 		if ( self.MonsterControlled ) then
 			-- Heroes are capturing
 			if ( self.TeamCapturing == TEAM_HERO ) then
-				self.CaptureProgress = self.CaptureProgress + ( FrameTime() * self.CaptureSpeed )
+				self.CaptureProgress = self.CaptureProgress + ( FrameTime() * self.CaptureSpeed * self.HeroesPresent )
 
 				-- Flag that the heroes have won this point
 				if ( self.CaptureProgress >= 100 ) then

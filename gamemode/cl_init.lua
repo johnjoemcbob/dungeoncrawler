@@ -27,15 +27,15 @@ end )
 function GM:Initialize()
 	self.BaseClass:Initialize()
 
-	-- Used to setup the control point map, function located within cl_hud.lua
-	self:Initialize_HUD()
-
 	-- Used to precache the buff icons, function located within cl_buff.lua
 	self:Initialize_Buffs()
 end
 
 function GM:InitPostEntity()
 	self.BaseClass:InitPostEntity()
+
+	-- Used to setup the control point map, function located within cl_hud.lua
+	self:InitPostEntity_HUD()
 
 	-- Store the ghost status of each entity id representing a player
 	LocalPlayer().OtherGhosts = {}
