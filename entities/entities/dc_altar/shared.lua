@@ -30,9 +30,11 @@ ENT.Active = false
 ENT.HornsIgnited = false
 ENT.PlayersInRange = {}
 ENT.PlayerMenuTime = 0
+ENT.DelayedCardFlip = 150
 ENT.AnimStage = 0 
 ENT.MenuOpened = 0
 ENT.SpellCardModels = {}
+ENT.TotalKnownSpells = 0
 
 
 function ENT:Initialize()
@@ -132,25 +134,29 @@ function ENT:OpenMenu()
 	if( CLIENT ) then
 		if( self:GetPos():Distance( LocalPlayer():GetPos() ) <= self.Radius * 1.5 ) then
 			-- Increment animation timer
-			self.PlayerMenuTime = self.PlayerMenuTime + 1
 			
+			self.DelayedCardFlip = self.DelayedCardFlip - 1
+
 			
-			if(self.PlayerMenuTime >= 300) then
-				self.PlayerMenuTime = 300
+			if(self.DelayedCardFlip <= 0) then
+				self.PlayerMenuTime = self.PlayerMenuTime + 1
+				if(self.PlayerMenuTime >= 300) then
+					self.PlayerMenuTime = 300
+				end			
+				self.DelayedCardFlip = 0
 			end
-			
 			
 			-- Get list of available spells -- GM.Spells!
 			if(self.MenuOpened == 0) then
 				local spellnum = 0
+				self.TotalKnownSpells = 0
 				for k, v in pairs(GAMEMODE.Spells) do
 					local cardmodel = ClientsideModel(	"models/props_c17/Frame002a.mdl", RENDERGROUP_BOTH )
-					cardmodel:SetPos(self:GetPos() + self:GetAngles():Up() * 35)
-
-					print(spellnum)
+					cardmodel:SetPos(self:GetPos() + self:GetAngles():Up() * 40)
 					cardmodel:SetAngles(self:GetAngles() + Angle(-90, 0, 0))
 					cardmodel:SetModelScale(0.25, 0)
 					spellnum = spellnum + 1
+					self.TotalKnownSpells = self.TotalKnownSpells + 1
 					table.insert(self.SpellCardModels, cardmodel )
 					
 				end
@@ -158,7 +164,7 @@ function ENT:OpenMenu()
 			end
 			local i = 1
 			for k, v in pairs(GAMEMODE.Spells) do
-				self:DrawSpellCard(self.SpellCardModels[i], v, i, 0)
+				self:DrawSpellCard(self.SpellCardModels[i], v, i, (self.PlayerMenuTime - i / 200 * 90))
 				i = i + 1
 			end
 			
@@ -172,6 +178,7 @@ function ENT:OpenMenu()
 	
 		else
 			self.PlayerMenuTime = 0
+			self.DelayedCardFlip = 150
 			self.MenuOpened = 0
 			-- Delete spell cards
 			for k, v in pairs(self.SpellCardModels) do
@@ -195,8 +202,8 @@ function ENT:DrawSpellCard(cardmodel, cardinfo, cardnum, rotamt)
 	if( CLIENT ) then
 		if(cardinfo != nil) then
 			-- rotation / movement / floating stuff
-			cardmodel:SetPos(self:GetPos() + (self:GetAngles():Up() * (35 + math.sin(CurTime()) * 5)))
-			cardmodel:SetPos(cardmodel:GetPos() + (self:GetAngles():Right() * cardnum * 15))
+			cardmodel:SetPos(self:GetPos() + (self:GetAngles():Right() * ((60 * cardnum / self.TotalKnownSpells) - 35) )   + (self:GetAngles():Up() * (40 + math.sin(CurTime() + cardnum) * 1)))
+			cardmodel:SetAngles(self:GetAngles() + Angle(-90 - rotamt, 0, 0))
 		end			
 	end
 	
