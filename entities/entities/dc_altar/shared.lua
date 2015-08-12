@@ -151,10 +151,11 @@ function ENT:OpenMenu()
 				local spellnum = 0
 				self.TotalKnownSpells = 0
 				for k, v in pairs(GAMEMODE.Spells) do
-					local cardmodel = ClientsideModel(	"models/props_c17/Frame002a.mdl", RENDERGROUP_BOTH )
+					local cardmodel = ClientsideModel(	"models/props_c17/Frame002a.mdl", RENDERGROUP_OPAQUE )
 					cardmodel:SetPos(self:GetPos() + self:GetAngles():Up() * 40)
 					cardmodel:SetAngles(self:GetAngles() + Angle(-90, 0, 0))
 					cardmodel:SetModelScale(0.25, 0)
+					cardmodel:SetRenderMode( RENDERMODE_TRANSALPHA )
 					spellnum = spellnum + 1
 					self.TotalKnownSpells = self.TotalKnownSpells + 1
 					table.insert(self.SpellCardModels, cardmodel )
@@ -164,19 +165,20 @@ function ENT:OpenMenu()
 			end
 			local i = 1
 			for k, v in pairs(GAMEMODE.Spells) do
-				self:DrawSpellCard(self.SpellCardModels[i], v, i, (self.PlayerMenuTime - i / 200 * 90))
+				self:DrawSpellCard(self.SpellCardModels[i], v, i, (self.PlayerMenuTime / 200 * 90))
 				i = i + 1
 			end
 			
 			
 			
-			-- When the player presses use...		
+			-- When the player presses use...	
 				-- Check the player's eye traces against each card
 				-- If a card is hit...
 					-- Pick this spell, disable the first-picked spell and move second-picked to first-picked slot.
 				
 	
 		else
+			-- Player moved away from altar
 			self.PlayerMenuTime = 0
 			self.DelayedCardFlip = 150
 			self.MenuOpened = 0
@@ -193,17 +195,15 @@ function ENT:OpenMenu()
 end
 
 
---    /!\ UGLY 3D2D CODE /!\
---	IT'S A DISGRACE, DON'T LOOK
---==============================
-
 function ENT:DrawSpellCard(cardmodel, cardinfo, cardnum, rotamt)
 
 	if( CLIENT ) then
 		if(cardinfo != nil) then
 			-- rotation / movement / floating stuff
-			cardmodel:SetPos(self:GetPos() + (self:GetAngles():Right() * ((60 * cardnum / self.TotalKnownSpells) - 35) )   + (self:GetAngles():Up() * (40 + math.sin(CurTime() + cardnum) * 1)))
+			cardmodel:SetPos(self:GetPos() + (self:GetAngles():Right() * ((60 * cardnum / self.TotalKnownSpells) - 35) ) + (self:GetAngles():Up() * (40 + math.sin(CurTime() + cardnum) * 1)))
 			cardmodel:SetAngles(self:GetAngles() + Angle(-90 - rotamt, 0, 0))
+			cardmodel:SetColor( Color(255, 255, 255, 255) )
+
 		end			
 	end
 	
@@ -239,3 +239,25 @@ function ENT:Draw()
 
 
 end
+
+-- Hook for 3D2D
+hook.Add( "PostDrawOpaqueRenderables", "AltarMenu", function()
+	
+	local altar = LocalPlayer().CurrentAltar
+	if(altar != nil && IsValid(altar)) then
+		--Draw 3D2D icons for cards
+		if(altar.MenuOpened > 0 && altar.PlayerMenuTime > 120) then
+			local i = 1
+			for k, v in pairs(GAMEMODE.Spells) do
+				
+				cam.Start3D2D( altar.SpellCardModels[i]:GetPos() + altar.SpellCardModels[i]:GetAngles():Right() * 2, altar.SpellCardModels[i]:GetAngles() + Angle(90, 0, 0), 1 )
+					surface.SetDrawColor( Color( 255, 255, 255, 255 ))
+					surface.DrawRect(0, 0, 4, 4)
+				cam.End3D2D()
+				i = i + 1
+			end
+		end
+	end
+	
+	
+end )
