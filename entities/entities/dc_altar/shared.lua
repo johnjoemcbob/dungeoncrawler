@@ -37,6 +37,7 @@ ENT.SpellCardModels = {}
 ENT.TotalKnownSpells = 0
 ENT.NextParticle = 0
 ENT.BetweenParticle = 0.5
+ENT.AlphaFade = 0
 
 
 function ENT:Initialize()
@@ -144,6 +145,10 @@ function ENT:OpenMenu()
 				self.PlayerMenuTime = self.PlayerMenuTime + 1
 				if(self.PlayerMenuTime >= 300) then
 					self.PlayerMenuTime = 300
+					self.AlphaFade = self.AlphaFade + 1
+					if(self.AlphaFade >= 255) then
+						self.AlphaFade = 255
+					end
 				end			
 				self.DelayedCardFlip = 0
 			end
@@ -222,7 +227,7 @@ function ENT:OpenMenu()
 				end
 			end
 			self.SpellCardModels = {}
-
+			self.AlphaFade = 0
 			LocalPlayer().CurrentAltar = nil
 		end
 	end
@@ -289,12 +294,12 @@ hook.Add( "PostDrawTranslucentRenderables", "AltarMenu", function()
 	local altar = LocalPlayer().CurrentAltar
 	if(altar != nil && IsValid(altar)) then
 		--Draw 3D2D icons for cards
-		if(altar.MenuOpened > 0 && altar.PlayerMenuTime > 120) then
+		if(altar.MenuOpened > 0 and altar.PlayerMenuTime > 260) then
 			local i = 1
 			for k, v in pairs(GAMEMODE.Spells) do
 				
 				cam.Start3D2D( altar.SpellCardModels[i]:GetPos() + altar.SpellCardModels[i]:GetAngles():Right() * 2 + altar.SpellCardModels[i]:GetAngles():Forward() * -0.2, altar.SpellCardModels[i]:GetAngles() + Angle(0, 0, -90 -45) + altar.SpellCardModels[i]:GetAngles():Up():Angle() + Angle(0, -90, 0), 1 )
-					surface.SetDrawColor( Color( 255, 255, 255, 255 ) )
+					surface.SetDrawColor( Color( 255, 255, 255, altar.AlphaFade ) )
 					surface.SetMaterial(v.Material)
 					surface.SetFont( "HudHintTextSmall" )
 
@@ -303,7 +308,7 @@ hook.Add( "PostDrawTranslucentRenderables", "AltarMenu", function()
 				cam.End3D2D()
 				
 				cam.Start3D2D( altar.SpellCardModels[i]:GetPos() + altar.SpellCardModels[i]:GetAngles():Right() * 2 + altar.SpellCardModels[i]:GetAngles():Forward() * -0.2, altar.SpellCardModels[i]:GetAngles() + Angle(0, 0, -90 -45) + altar.SpellCardModels[i]:GetAngles():Up():Angle() + Angle(0, -90, 0), 1 / string.len(v.Name) )
-					surface.SetTextColor( Color( 255, 255, 255, 255 ) )
+					surface.SetTextColor( Color( 255, 255, 255, altar.AlphaFade ) )
 					surface.SetTextPos(-0.5, -30)
 					
 					surface.DrawText(v.Name)

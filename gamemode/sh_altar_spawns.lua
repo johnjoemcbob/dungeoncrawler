@@ -44,8 +44,8 @@ table.insert(
 table.insert(
 	GM.AltarSpawns,
 	{
-		Position = Vector( 5388, -6266, 659 ),
-		Rotation = Angle( 0, -90, 0 )
+		Position = Vector( 5200, -6440, 659 ), --Vector( 5388, -6266, 659 ),
+		Rotation = Angle( 0, 0, 0 )
 	}
 )
 
@@ -53,7 +53,7 @@ table.insert(
 table.insert(
 	GM.AltarSpawns,
 	{
-		Position = Vector( 1148, 6961, -340 ),
-		Rotation = Angle( 0, 180, 0 )
+		Position = Vector( 1009, 7030, -340 ), --Vector( 1148, 6961, -340 ),
+		Rotation = Angle( 0, 0, 0 )
 	}
 )
