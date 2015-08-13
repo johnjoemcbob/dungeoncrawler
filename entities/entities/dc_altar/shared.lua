@@ -153,11 +153,12 @@ function ENT:OpenMenu()
 				local spellnum = 0
 				self.TotalKnownSpells = 0
 				for k, v in pairs(GAMEMODE.Spells) do
-					local cardmodel = ClientsideModel(	"models/props_c17/Frame002a.mdl", RENDERGROUP_OPAQUE )
+					local cardmodel = ClientsideModel(	"models/props_c17/Frame002a.mdl", RENDERGROUP_BOTH )
 					cardmodel:SetPos(self:GetPos() + self:GetAngles():Up() * 40)
 					cardmodel:SetAngles(self:GetAngles() + Angle(-90, 0, 0))
 					cardmodel:SetModelScale(0.25, 0)
 					cardmodel:SetRenderMode( RENDERMODE_TRANSALPHA )
+					cardmodel.AssociatedSpell = v
 					spellnum = spellnum + 1
 					self.TotalKnownSpells = self.TotalKnownSpells + 1
 					table.insert(self.SpellCardModels, cardmodel )
@@ -172,6 +173,36 @@ function ENT:OpenMenu()
 			end
 			
 			
+			-- Trace to the cards i guess
+			local i = 1
+			for k, v in pairs(self.SpellCardModels) do
+				local rayResult = util.IntersectRayWithPlane(LocalPlayer():EyePos(), LocalPlayer():GetAimVector() * 2, v:GetPos(), v:GetAngles():Forward() * -1)
+
+	
+				
+				if(rayResult != nil) then
+					local offset = v:GetPos() - rayResult
+					-- Transform offset by plane normal to find out how far along the plane it is		
+					offset:Rotate(-v:GetAngles():Forward():Angle())
+					xamt = -offset.y
+					yamt = offset.x
+					
+					if(xamt > -3 and xamt < 3) then
+						if(yamt > -4 and yamt < 4) then
+							-- HIT A SPELL CARD
+							print(v.AssociatedSpell.Name)
+							v:SetColor(Color(0, 0, 0, 255))
+						end
+					end
+
+					
+					
+				else
+					v:SetColor(Color(255, 255, 255, 255))
+				end
+				
+				i = i + 1
+			end
 			
 			-- When the player presses use...	
 				-- Check the player's eye traces against each card
@@ -227,7 +258,7 @@ function ENT:Think()
 			self:ExtinguishHorns()
 		end
 	end
-
+	
 	
 	if( CLIENT ) then
 		if(LocalPlayer().CurrentAltar == self) then
@@ -253,7 +284,7 @@ function ENT:Draw()
 end
 
 -- Hook for 3D2D
-hook.Add( "PostDrawOpaqueRenderables", "AltarMenu", function()
+hook.Add( "PostDrawTranslucentRenderables", "AltarMenu", function()
 	
 	local altar = LocalPlayer().CurrentAltar
 	if(altar != nil && IsValid(altar)) then
@@ -262,10 +293,22 @@ hook.Add( "PostDrawOpaqueRenderables", "AltarMenu", function()
 			local i = 1
 			for k, v in pairs(GAMEMODE.Spells) do
 				
-				cam.Start3D2D( altar.SpellCardModels[i]:GetPos() + altar.SpellCardModels[i]:GetAngles():Right() * 2, altar.SpellCardModels[i]:GetAngles() + Angle(90, 0, 0), 1 )
-					surface.SetDrawColor( Color( 255, 255, 255, 255 ))
-					surface.DrawRect(0, 0, 4, 4)
+				cam.Start3D2D( altar.SpellCardModels[i]:GetPos() + altar.SpellCardModels[i]:GetAngles():Right() * 2 + altar.SpellCardModels[i]:GetAngles():Forward() * -0.2, altar.SpellCardModels[i]:GetAngles() + Angle(0, 0, -90 -45) + altar.SpellCardModels[i]:GetAngles():Up():Angle() + Angle(0, -90, 0), 1 )
+					surface.SetDrawColor( Color( 255, 255, 255, 255 ) )
+					surface.SetMaterial(v.Material)
+					surface.SetFont( "HudHintTextSmall" )
+
+					surface.DrawTexturedRect(0, -1.5, 4, 4)
+					
 				cam.End3D2D()
+				
+				cam.Start3D2D( altar.SpellCardModels[i]:GetPos() + altar.SpellCardModels[i]:GetAngles():Right() * 2 + altar.SpellCardModels[i]:GetAngles():Forward() * -0.2, altar.SpellCardModels[i]:GetAngles() + Angle(0, 0, -90 -45) + altar.SpellCardModels[i]:GetAngles():Up():Angle() + Angle(0, -90, 0), 1 / string.len(v.Name) )
+					surface.SetTextColor( Color( 255, 255, 255, 255 ) )
+					surface.SetTextPos(-0.5, -30)
+					
+					surface.DrawText(v.Name)
+				cam.End3D2D()
+				
 				i = i + 1
 			end
 		end
