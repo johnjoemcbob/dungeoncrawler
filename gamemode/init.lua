@@ -4,6 +4,7 @@
 
 AddCSLuaFile( "cl_atmosphere.lua" )
 AddCSLuaFile( "cl_buff.lua" )
+AddCSLuaFile( "cl_spell.lua" )
 AddCSLuaFile( "cl_hud.lua" )
 AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
@@ -21,6 +22,7 @@ end
 
 include( "shared.lua" )
 include( "sv_buff.lua" )
+include( "sv_spell.lua" )
 
 -- Sends to cl_hud.lua
 util.AddNetworkString( "DC_Client_Round" )
@@ -139,6 +141,9 @@ function GM:PlayerInitialSpawn( ply )
 
 	-- Used to initialize the player buff table, function located within sv_buff.lua
 	self:PlayerInitialSpawn_Buff( ply )
+
+	-- Used to initialize the player spell table, function located within sv_spell.lua
+	self:PlayerInitialSpawn_Spell( ply )
 end
 
 function GM:PlayerSpawn( ply )
@@ -151,6 +156,11 @@ function GM:PlayerSpawn( ply )
 
 	-- No players can zoom in this gamemode
 	ply:SetCanZoom( false )
+
+	local newtable = table.shallowcopy( self.Spells["dc_projectile_fire"] )
+		newtable.Name = "Hi"
+	PrintTable( newtable )
+	PrintTable( self.Spells["dc_projectile_fire"] )
 end
 
 function GM:PostPlayerDeath( ply )
@@ -225,6 +235,11 @@ function GM:OnPreRoundStart( num )
 		if ( ply.TriggerZone and IsValid( ply.TriggerZone ) ) then
 			ply.TriggerZone:RemovePlayer( ply )
 		end
+
+		-- Remove loot from players
+		-- Now initialized in the hero class loadout
+		ply.LootedSpells = nil
+		ply.Spells = {}
 	end
 
 	-- Cleanup and then spawn all gamemode map items again (e.g. checkpoints)
@@ -301,6 +316,22 @@ function GM:PlayerRequestTeam( ply, teamid )
 	end
 
 	return self.BaseClass:PlayerRequestTeam( ply, teamid )
+end
+
+-- Make a shallow copy of a table (from http://lua-users.org/wiki/CopyTable)
+function table.shallowcopy( orig )
+    local orig_type = type( orig )
+    local copy
+    if ( orig_type == "table" ) then
+        copy = {}
+        for orig_key, orig_value in pairs( orig ) do
+            copy[orig_key] = orig_value
+        end
+	-- Number, string, boolean, etc
+    else
+        copy = orig
+    end
+    return copy
 end
 
 hook.Add( "PlayerSpawn", "DC_PlayerSpawn_HandsSetup", function( ply )

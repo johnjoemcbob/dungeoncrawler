@@ -16,7 +16,7 @@ function SendClientBuffInformation( ply, id )
 	net.Send( ply )
 end
 
-local plymeta = FindMetaTable( "Player" );
+local plymeta = FindMetaTable( "Player" )
 
 function plymeta:AddBuff( id )
 	if ( id <= 0 ) then return end

@@ -281,14 +281,29 @@ function GM:HUDPaint_Spells()
 
 	for spell = 1, 2 do
 		if ( LocalPlayer().Spells[spell] ~= "" ) then
-			-- Backdrop
-			surface.SetDrawColor( 181, 140, 50, 200 )
-			surface.DrawRect( x, y, size, size )
+			local spellnumber = tonumber( LocalPlayer().Spells[spell] )
+			if ( spellnumber ) then
+				local lootedspell = LocalPlayer().LootedSpells[spellnumber]
+				if ( lootedspell ) then
+					-- Backdrop
+					surface.SetDrawColor( 181, 140, 50, 200 )
+					surface.DrawRect( x, y, size, size )
 
-			-- Icon
-			surface.SetDrawColor( 255, 255, 255, 255 )
-			surface.SetMaterial( self.Spells[LocalPlayer().Spells[spell]].Material	)
-			surface.DrawTexturedRect( x, y, size, size )
+					-- Icon
+					surface.SetDrawColor( 255, 255, 255, 255 )
+					surface.SetMaterial( self.Spells[lootedspell.Base].Material	)
+					surface.DrawTexturedRect( x, y, size, size )
+				end
+			else
+				-- Backdrop
+				surface.SetDrawColor( 181, 140, 50, 200 )
+				surface.DrawRect( x, y, size, size )
+
+				-- Icon
+				surface.SetDrawColor( 255, 255, 255, 255 )
+				surface.SetMaterial( self.Spells[LocalPlayer().Spells[spell]].Material	)
+				surface.DrawTexturedRect( x, y, size, size )
+			end
 		end
 
 		-- Move over

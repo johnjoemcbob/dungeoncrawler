@@ -55,10 +55,7 @@ end
 function SWEP:PrimaryAttack( right )
 	if ( SERVER ) then
 		if ( CurTime() > self.Primary.NextCast ) then
-			local spell = GAMEMODE.Spells[self.Owner.Spells[1]]
-			self:Cast( spell )
-
-			self.Primary.NextCast = CurTime() + spell.Cooldown
+			self.Primary.NextCast = CurTime() + self:Cast( self.Owner.Spells[1] )
 		end
 	end
 end
@@ -66,10 +63,7 @@ end
 function SWEP:SecondaryAttack()
 	if ( SERVER ) then
 		if ( CurTime() > self.Secondary.NextCast ) then
-			local spell = GAMEMODE.Spells[self.Owner.Spells[2]]
-			self:Cast( spell )
-
-			self.Secondary.NextCast = CurTime() + spell.Cooldown
+			self.Secondary.NextCast = CurTime() + self:Cast( self.Owner.Spells[2] )
 		end
 	end
 end
@@ -169,7 +163,21 @@ function SWEP:Think()
 	end
 end
 
-function SWEP:Cast( spell )
+function SWEP:Cast( spellname )
+	-- Simple monster spell, has not random qualities
+	if ( type( spellname ) == "string" ) then
+		spell = GAMEMODE.Spells[spellname]
+	-- Hero spell, has advanced
+	else
+		spellname = self.Owner.LootedSpells[spellname]
+		spell = GAMEMODE.Spells[spellname.Base]
+		for k, v in pairs( spellname ) do
+			if ( k ~= "Name" ) then
+				spell[k] = v
+			end
+		end
+	end
+
 	if ( spell.Type == "Totem" ) then
 		self:Cast_TrapTotem( spell )
 	elseif ( spell.Type == "Projectile" ) then
@@ -179,6 +187,11 @@ function SWEP:Cast( spell )
 	elseif ( spell.Type == "Misc" ) then
 		self:Cast_Misc( spell )
 	end
+
+	if ( spell.Cooldown == 0 ) then
+		return 0.01
+	end
+	return ( 1 / spell.Cooldown )
 end
 
 -- Base function for any spells which create world traps to hurt heroes,

@@ -49,9 +49,14 @@ function CLASS:Loadout( ply )
 	if ( not ply.Ghost ) then
 		ply:Give( "dc_magichand" )
 
+		if ( not ply.LootedSpells ) then
+			ply.LootedSpells = {}
+			ply:AddSpell( "dc_projectile_fire", 0 )
+			ply:AddSpell( "dc_totem_light", 0 )
+		end
 		ply.Spells = {
-			"dc_projectile_fire",
-			"dc_totem_light"
+			1,
+			2
 		}
 		SendClientSpellInformation( ply )
 	end

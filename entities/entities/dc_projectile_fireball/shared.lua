@@ -34,6 +34,8 @@ function ENT:Initialize()
 
 	-- Initialize shared projectile properties
 	self:SetModel( "models/Combine_Helicopter/helicopter_bomb01.mdl" )
+	self:SetMaterial( "models/debug/debugwhite" )
+	self:SetColor( Color( 255, 100, 100 ) )
 	self:SetSolid( SOLID_BBOX )
 
 	-- Initialize the scalable collision model for this projectile
@@ -60,12 +62,14 @@ function ENT:Initialize()
 
 	-- Save the start position of the projectile for cleanup if out of range
 	self.StartPos = self:GetPos()
+
+	ParticleEffectAttach( "fire_small_02", PATTACH_POINT_FOLLOW, self, 0 )
 end
 
 function ENT:Think()
 	-- Increase projectile scale
-	if ( self.Scale < 1 ) then
-		self.Scale = math.Approach( self.Scale, 1, FrameTime() * 10 )
+	if ( self.Scale < 0.5 ) then
+		self.Scale = math.Approach( self.Scale, 0.5, FrameTime() * 10 )
 		self:UpdateScale()
 	end
 
@@ -82,10 +86,10 @@ function ENT:Think()
 				velocity = physics:GetVelocity()
 			end
 		local forward = self:GetUp()
-		local effectdata = EffectData()
-			effectdata:SetOrigin( self:GetPos() )
-			effectdata:SetAngles( Angle( self:EntIndex(), 0, 0 ) )
-		self.OpenEffect = util.Effect( "dc_fire", effectdata )
+		-- local effectdata = EffectData()
+			-- effectdata:SetOrigin( self:GetPos() )
+			-- effectdata:SetAngles( Angle( self:EntIndex(), 0, 0 ) )
+		-- self.OpenEffect = util.Effect( "dc_fire", effectdata )
 
 		-- Explode if the spell has gone out of range
 		if ( self.StartPos and ( self.StartPos:Distance( self:GetPos() ) > self.Range ) ) then

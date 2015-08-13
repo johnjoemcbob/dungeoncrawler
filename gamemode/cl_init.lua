@@ -6,6 +6,7 @@ include( "shared.lua" )
 include( "cl_atmosphere.lua" )
 include( "cl_hud.lua" )
 include( "cl_buff.lua" )
+include( "cl_spell.lua" )
 
 -- Initialization of this message is contained within class/hero.lua
 net.Receive( "DC_Client_Ghost", function( len )

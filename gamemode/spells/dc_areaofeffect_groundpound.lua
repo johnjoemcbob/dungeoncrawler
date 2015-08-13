@@ -7,7 +7,7 @@ GM.Spells["dc_areaofeffect_groundpound"] =
 	Name = "Ground Pound",
 	Icon = "icon16/vector.png",
 	Type = "Misc",
-	Cooldown = 5,
+	Cooldown = 0.2,
 	Create = function( self, ply )
 		-- Must be on solid ground to cast
 		if ( not ply:OnGround() ) then return end

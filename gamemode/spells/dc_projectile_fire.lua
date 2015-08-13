@@ -17,5 +17,19 @@ GM.Spells["dc_projectile_fire"] =
 			spell:Spawn()
 		return spell, angle
 	end,
-	Range = 500
+	Random = {
+		Range = {
+			Min = 500,
+			Max = 1000
+		},
+		Cooldown = {
+			Min = 2.5,
+			Max = 5,
+			ChanceMultiplier = 0.1
+		},
+		Damage = {
+			Min = 5,
+			Max = 25
+		}
+	}
 }
