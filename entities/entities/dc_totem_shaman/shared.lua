@@ -40,6 +40,9 @@ function ENT:Initialize()
 		self.Skull:SetParent( self.Entity )
 	end
 
+	-- Play sound 
+	sound.Play("ambient/creatures/flies" .. math.random(1, 5) ..  ".wav", self:GetPos())
+	
 	-- Change to the time at which the entity will be removed
 	self.Time = self.Time + CurTime()
 end
@@ -65,6 +68,9 @@ function ENT:Think()
 			util.Effect( "AntlionGib", effectdata, true, true )
 
 			self.NextEffect = CurTime() + self.BetweenEffect
+			
+			-- Play sound 
+			sound.Play("ambient/creatures/flies" .. math.random(1, 5) ..  ".wav", self:GetPos())
 		end
 
 		-- Remove the totem after its time is up

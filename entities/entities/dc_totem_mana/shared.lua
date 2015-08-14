@@ -32,6 +32,9 @@ function ENT:Initialize()
 		self.Owner.Totem:Remove()
 	end
 	self.Owner.Totem = self
+	
+	self:EmitSound("ambient/levels/labs/teleport_preblast_suckin1.wav")
+	
 end
 
 function ENT:Think()
@@ -49,6 +52,7 @@ function ENT:Think()
 
 		-- Remove the totem after its time is up
 		if ( CurTime() > self.Time ) then
+			
 			self:Remove()
 		end
 	end

@@ -34,6 +34,9 @@ function ENT:Initialize()
 	self:SetCollisionBounds( minpos, maxpos )
 	self:PhysicsInitBox( minpos, maxpos )
 	self:UpdateScale()
+	
+	-- Play Sound
+	sound.Play("npc/headcrab_poison/ph_poisonbite" .. math.random(1,3) .. ".wav", self:GetPos())
 
 	if SERVER then
 		-- Physics enabled

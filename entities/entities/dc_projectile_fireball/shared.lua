@@ -62,6 +62,8 @@ function ENT:Initialize()
 
 	-- Save the start position of the projectile for cleanup if out of range
 	self.StartPos = self:GetPos()
+	
+	sound.Play("ambient/fire/mtov_flame2.wav", self:GetPos(), 75, 100, 0.15)
 
 	ParticleEffectAttach( "fire_small_02", PATTACH_POINT_FOLLOW, self, 0 )
 end
@@ -113,15 +115,15 @@ function ENT:PhysicsCollide( data, phys )
 end
 
 function ENT:BlowUp()
-	-- Play sound effect
-	self:EmitSound( Sound( "Flashbang.Bounce" ) )
+	sound.Play("weapons/underwater_explode3.wav", self:GetPos())
 
 	-- Play particle effect
 	local effectdata = EffectData() 
 		effectdata:SetStart( self:GetPos() )
 		effectdata:SetOrigin( self:GetPos() ) 
-		effectdata:SetScale( math.random( 1,3 ) )
-	util.Effect( "watersplash", effectdata )
+		effectdata:SetScale( math.random( 0.3, 0.5 ) )
+		effectdata:SetRadius( math.random( 0.3, 0.5 ) )
+	util.Effect( "HelicopterMegaBomb", effectdata )
 
 	-- Apply damage and burning debuff to closeby players
 	local entsinrange = ents.FindInSphere( self:GetPos(), self.Radius )
