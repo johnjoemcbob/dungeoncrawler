@@ -11,7 +11,7 @@ Matthew Cormack (@johnjoemcbob),
 Nichlas Rager (@dasomeone),
 Jordan Brown (@DrMelon)
 
-Based on the map;
+Based on the map
 rp_harmonti
 by
 Sadamer
