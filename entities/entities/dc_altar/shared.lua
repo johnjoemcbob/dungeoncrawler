@@ -14,6 +14,9 @@
 
 if SERVER then
 	AddCSLuaFile( "shared.lua" )
+	-- Network stuff
+	util.AddNetworkString( "player_picked_spell_1" )
+	util.AddNetworkString( "player_picked_spell_2" )	
 end
 
 if CLIENT then
@@ -39,13 +42,13 @@ ENT.NextParticle = 0
 ENT.BetweenParticle = 0.5
 ENT.AlphaFade = 0
 
-
 function ENT:Initialize()
 	-- Set own model for table.
 	self:SetModel( "models/props_combine/breendesk.mdl" )
 	self:SetSolid( SOLID_VPHYSICS )
 	self:SetSolid( SOLID_VPHYSICS )
 	self.DefaultPos = self:GetPos()
+
 
 	-- Store the old angles and reset to default for decoration setup
 	local oldangles = self:GetAngles()
@@ -155,7 +158,7 @@ function ENT:OpenMenu()
 			
 			-- Get list of available spells -- GM.Spells!
 			if(self.MenuOpened == 0) then
-				local spellnum = 0
+				local spellnum = 1
 				self.TotalKnownSpells = 0
 				for k, v in pairs(LocalPlayer().LootedSpells) do
 					local cardmodel = ClientsideModel( "models/props_c17/Frame002a.mdl", RENDERGROUP_BOTH )
@@ -164,6 +167,7 @@ function ENT:OpenMenu()
 					cardmodel:SetModelScale(0.25, 0)
 					cardmodel:SetRenderMode( RENDERMODE_TRANSALPHA )
 					cardmodel.AssociatedSpell = v
+					cardmodel.SpellNum = spellnum
 					spellnum = spellnum + 1
 					self.TotalKnownSpells = self.TotalKnownSpells + 1
 					table.insert(self.SpellCardModels, cardmodel )
@@ -180,6 +184,7 @@ function ENT:OpenMenu()
 			
 			-- Trace to the cards i guess
 			local i = 1
+			local lookingAtCard = nil
 			for k, v in pairs(self.SpellCardModels) do
 				local rayResult = util.IntersectRayWithPlane(LocalPlayer():EyePos(), LocalPlayer():GetAimVector() * 2, v:GetPos(), v:GetAngles():Forward() * -1)
 
@@ -195,8 +200,8 @@ function ENT:OpenMenu()
 					if(xamt > -3 and xamt < 3) then
 						if(yamt > -4 and yamt < 4) then
 							-- HIT A SPELL CARD
-							--print(GAMEMODE.Spells[v.AssociatedSpell.Base].Name)
 							v:SetColor(Color(0, 0, 0, 255))
+							lookingAtCard = v
 						end
 					end
 
@@ -209,10 +214,36 @@ function ENT:OpenMenu()
 				i = i + 1
 			end
 			
-			-- When the player presses use...	
-				-- Check the player's eye traces against each card
-				-- If a card is hit...
-					-- Pick this spell, disable the first-picked spell and move second-picked to first-picked slot.
+			-- When the player presses use, and is looking at a card...
+			if(LocalPlayer().ChosenCardNum == nil) then
+				LocalPlayer().ChosenCardNum = 1
+			end
+			
+			if(LocalPlayer():KeyPressed(IN_USE) && lookingAtCard != nil) then
+				-- Left Hand Spell
+				if(LocalPlayer().ChosenCardNum == 1) then
+					
+					LocalPlayer().Spells[1] = lookingAtCard.SpellNum
+
+					net.Start("player_picked_spell_1")
+					net.WriteInt(lookingAtCard.SpellNum, 32)
+					net.SendToServer()
+					
+					PrintTable(lookingAtCard.AssociatedSpell)
+					LocalPlayer().ChosenCardNum = 2
+				else
+				-- Right Hand Spell
+				
+					LocalPlayer().Spells[2] = lookingAtCard.SpellNum
+
+					net.Start("player_picked_spell_2")
+					net.WriteInt(lookingAtCard.SpellNum, 32)
+					net.SendToServer()
+					LocalPlayer().ChosenCardNum = 1
+				end
+			end
+					
+					
 				
 	
 		else
@@ -229,6 +260,8 @@ function ENT:OpenMenu()
 			self.SpellCardModels = {}
 			self.AlphaFade = 0
 			LocalPlayer().CurrentAltar = nil
+			LocalPlayer().ChosenCardNum = 1
+
 		end
 	end
 end
@@ -249,6 +282,23 @@ function ENT:DrawSpellCard(cardmodel, cardinfo, cardnum, rotamt)
 
 end
 
+-- Handle Messages about Spells
+net.Receive( "player_picked_spell_1", function (len, pl)
+	if( IsValid(pl) and pl:IsPlayer()) then
+		spellpicked = net.ReadInt(32)
+		pl.Spells[1] = spellpicked
+	end
+end )
+
+net.Receive( "player_picked_spell_2", function (len, pl)
+	if( IsValid(pl) and pl:IsPlayer()) then
+		spellpicked = net.ReadInt(32)
+		pl.Spells[2] = spellpicked
+	end
+end )
+
+	
+
 function ENT:Think()
 	-- The spell altar should light up the horns when heroes get close, and then extinguish if nobody is nearby.
 	self:CheckHeroes()
@@ -262,6 +312,8 @@ function ENT:Think()
 			self.IsLightSource = false
 			self:ExtinguishHorns()
 		end
+		
+
 	end
 	
 	
