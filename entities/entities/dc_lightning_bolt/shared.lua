@@ -40,7 +40,11 @@ function ENT:Initialize()
 		local endent = ents.Create( "info_target" )
 		local result = self.Owner:GetEyeTrace()
 		if(result != nil) then
-			endent:SetPos(result.HitPos)
+			if(self.Owner:EyePos():Distance(result.HitPos) <= self.Range) then
+				endent:SetPos(result.HitPos)
+			else
+				endent:SetPos(self.Owner:EyePos() + self.Owner:EyeAngles():Forward() * self.Range)
+			end
 		else
 			endent:SetPos(self.Owner:EyePos() + self.Owner:EyeAngles():Forward() * self.Range)
 		end

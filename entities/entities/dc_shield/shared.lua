@@ -38,7 +38,7 @@ function ENT:Initialize()
 	self:SetSolid( SOLID_BBOX )
 	self:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR )
 	self:SetMoveType(MOVETYPE_NONE)
-	
+	self:SetHealth(self.Damage)
 
 	
 end
@@ -52,6 +52,9 @@ function ENT:Think()
 		self:SetAngles((self:GetPos() - self.Owner:GetPos()):Angle() + Angle(0, 90, 0))
 		
 		self:SetParent(nil)
+		if(self.Accumulator > 6 or self:Health() < 1) then
+			self:Remove()
+		end
 	end
 	
 end
