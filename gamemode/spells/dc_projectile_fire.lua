@@ -5,10 +5,11 @@
 GM.Spells["dc_projectile_fire"] =
 {
 	Name = "Fireball",
+	Description = "A fiery ball of pain",
 	Icon = "icon16/wand.png",
 	Type = "Projectile",
 	Level = 0,
-	Cooldown = 2.5,
+	Cooldown = 0.4,
 	ManaUsage = 5,
 	Create = function( self, ply, pos )
 		local angle = Angle( 0, 0, 0 )
@@ -22,12 +23,13 @@ GM.Spells["dc_projectile_fire"] =
 	Random = {
 		Range = {
 			Min = 500,
-			Max = 1000
+			Max = 1000,
+			ChanceMultiplier = 0
 		},
 		Cooldown = {
-			Min = 2.5,
-			Max = 5,
-			ChanceMultiplier = 0.1
+			Min = 3,
+			Max = 0.5,
+			ChanceMultiplier = 0.5
 		},
 		Damage = {
 			Min = 5,
@@ -35,7 +37,8 @@ GM.Spells["dc_projectile_fire"] =
 		},
 		ManaUsage = {
 			Min = 5,
-			Max = 20
+			Max = 10,
+			ChanceMultiplier = 0
 		}
 	}
 }

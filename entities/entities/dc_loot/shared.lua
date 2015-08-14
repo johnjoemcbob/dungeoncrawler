@@ -70,7 +70,7 @@ if SERVER then
 		-- Find nearby unclaimed players
 		local entsinrange = ents.FindInSphere( self:GetPos(), self.Radius )
 		for k, ply in pairs( entsinrange ) do
-			if ( ply:IsPlayer() and ply:Alive() ) then
+			if ( ply:IsPlayer() and ply:Alive() and ( ply:Team() == TEAM_HERO ) ) then
 				if ( not self.HeroesClaimed[ply:EntIndex()] ) then
 					local possiblespells = {}
 						for m, spell in pairs( GAMEMODE.Spells ) do
@@ -78,7 +78,6 @@ if SERVER then
 								table.insert( possiblespells, m )
 							end
 						end
-					PrintTable( possiblespells )
 					ply:AddSpell( possiblespells[math.random( 1, #possiblespells )], self.Level )
 
 					self.HeroesClaimed[ply:EntIndex()] = true

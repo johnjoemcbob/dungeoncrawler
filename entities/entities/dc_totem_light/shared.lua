@@ -35,7 +35,7 @@ function ENT:Initialize()
 	ParticleEffectAttach( "fire_small_02", PATTACH_POINT_FOLLOW, self, 1 )
 
 	-- Remove the previous light totem
-	if ( self.Owner.LightTotem ) then
+	if ( self.Owner.LightTotem and IsValid( self.Owner.LightTotem ) ) then
 		self.Owner.LightTotem:Remove()
 	end
 	self.Owner.LightTotem = self

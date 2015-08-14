@@ -126,16 +126,24 @@ function GM:InitPostEntity_HUD()
 	end
 end
 
+function GM:Think_HUD()
+	
+end
+
 function GM:ContextMenuOpen()
 	return true
 end
 
 function GM:OnContextMenuOpen()
 	gui.EnableScreenClicker( true )
+
+	-- Show spell description when the context menu is open
+	LocalPlayer().DisplaySpellDesc = { true, true }
 end
 
 function GM:OnContextMenuClose()
 	gui.EnableScreenClicker( false )
+	LocalPlayer().DisplaySpellDesc = { false, false }
 end
 
 function GM:HUDPaint()
@@ -149,6 +157,11 @@ function GM:HUDPaint()
 	-- Control point information
 	self:HUDPaint_ControlPoint_Overall()
 	self:HUDPaint_ControlPoint_Current()
+
+	-- Spell Altar information
+	if ( LocalPlayer().SpellAltarCard and IsValid( LocalPlayer().SpellAltarCard ) ) then
+		GAMEMODE:HUDPaint_Spell_Tooltip( ScrW() / 2, ScrH(), GAMEMODE.Spells[LocalPlayer().SpellAltarCard.AssociatedSpell.Base], LocalPlayer().SpellAltarCard.AssociatedSpell, 0, 255 )
+	end
 
 	-- Round information
 	self:HUDPaint_Round()
@@ -274,70 +287,158 @@ function GM:HUDPaint_Spells()
 	if ( not LocalPlayer().Spells ) then return end
 	if ( not LocalPlayer():Alive() ) then return end
 
-	local size = ScrH() / 20
-	local x = ScrW() / 4
-	local y = ScrH() - size
+	local defx = ScrW() / 4
+	local defy = ScrH()
+
+	local size = defy / 20
+	local x = defx - ( size / 2 )
+	local y
+	local descx = defx
 
 	for spell = 1, 2 do
 		if ( LocalPlayer().Spells[spell] ~= "" ) then
-			local spellnumber = tonumber( LocalPlayer().Spells[spell] )
-			if ( spellnumber ) then
-				local lootedspell = LocalPlayer().LootedSpells[spellnumber]
-				if ( lootedspell ) then
-					-- Backdrop
-					surface.SetDrawColor( 181, 140, 50, 200 )
-					surface.DrawRect( x, y, size, size )
-
-					-- Cooldown
-					if ( LocalPlayer():GetActiveWeapon() ) then
-						local cooldown = LocalPlayer():GetActiveWeapon():GetNextPrimaryFire()
-							if ( spell == 2 ) then
-								cooldown = LocalPlayer():GetActiveWeapon():GetNextSecondaryFire()
-							end
-						local multiplier = math.max( cooldown - CurTime(), 0 ) / ( 1 / ( self.Spells[lootedspell.Base].Cooldown or 0.01 ) )
-						surface.SetDrawColor( 50, 200 - ( 200 * multiplier ), 50, 255 )
-						surface.DrawRect(
-							x, y,
-							size - ( size * multiplier ),
-							size
-						)
-					end
-
-					-- Icon
-					surface.SetDrawColor( 255, 255, 255, 255 )
-					surface.SetMaterial( self.Spells[lootedspell.Base].Material	)
-					surface.DrawTexturedRect( x, y, size, size )
+			local spelldesc, spellval
+				local spellnumber = tonumber( LocalPlayer().Spells[spell] )
+				if ( spellnumber ) then
+					spelldesc = self.Spells[LocalPlayer().LootedSpells[spellnumber].Base]
+					spellval = LocalPlayer().LootedSpells[spellnumber]
+				else
+					spelldesc = self.Spells[LocalPlayer().Spells[spell]]
+					spellval = spelldesc
 				end
-			else
-				-- Backdrop
-				surface.SetDrawColor( 181, 140, 50, 200 )
-				surface.DrawRect( x, y, size, size )
+			if ( spelldesc and spellval ) then
+				-- Reset position for icon
+				y = defy - size
 
 				-- Cooldown
-				if ( LocalPlayer():GetActiveWeapon() ) then
-					local cooldown = LocalPlayer():GetActiveWeapon():GetNextPrimaryFire()
-						if ( spell == 2 ) then
-							cooldown = LocalPlayer():GetActiveWeapon():GetNextSecondaryFire()
-						end
-					local multiplier = math.max( cooldown - CurTime(), 0 ) / ( 1 / ( self.Spells[LocalPlayer().Spells[spell]].Cooldown or 0.01 ) )
-					surface.SetDrawColor( 50, 200 - ( 200 * multiplier ), 50, 255 )
-					surface.DrawRect(
-						x, y,
-						size - ( size * multiplier ),
-						size
-					)
+				local cooldown
+				if ( LocalPlayer():GetActiveWeapon() and IsValid( LocalPlayer():GetActiveWeapon() ) ) then
+					cooldown = LocalPlayer():GetActiveWeapon():GetNextPrimaryFire()
+					if ( spell == 2 ) then
+						cooldown = LocalPlayer():GetActiveWeapon():GetNextSecondaryFire()
+					end
 				end
+				if ( not cooldown ) then
+					cooldown = CurTime()
+				end
+
+				local descheight = 0
+				if ( LocalPlayer().DisplaySpellDesc and LocalPlayer().DisplaySpellDesc[spell] ) then
+					descheight = self:HUDPaint_Spell_Tooltip( descx, defy, spelldesc, spellval, math.Round( cooldown - CurTime() ) )
+					-- Move over
+					descx = descx + ( ScrW() / 2 )
+				end
+
+				-- Backdrop
+				surface.SetDrawColor( 181, 140, 50, 200 )
+				surface.DrawRect( x, y - descheight, size, size )
+
+				local multiplier = math.max( cooldown - CurTime(), 0 ) / ( spellval.Cooldown or 0.01 )
+				surface.SetDrawColor( 50, 200 - ( 200 * multiplier ), 50, 255 )
+				surface.DrawRect(
+					x, y - descheight,
+					size - ( size * multiplier ),
+					size
+				)
 
 				-- Icon
 				surface.SetDrawColor( 255, 255, 255, 255 )
-				surface.SetMaterial( self.Spells[LocalPlayer().Spells[spell]].Material	)
-				surface.DrawTexturedRect( x, y, size, size )
+				surface.SetMaterial( spelldesc.Material	)
+				surface.DrawTexturedRect( x, y - descheight, size, size )
 			end
 		end
 
-		-- Move over
 		x = x + ( ScrW() / 2 )
 	end
+end
+
+-- Display spell tooltip
+function GM:HUDPaint_Spell_Tooltip( defx, defy, spelldesc, spellval, cooldown, backalpha )
+	if ( not backalpha ) then backalpha = 200 end
+
+	local textspacing = ScrH() / 30
+	local descborder = ScrH() / 30
+
+	local font = "TargetID"
+	surface.SetFont( font )
+	local _, fontheight = surface.GetTextSize( "TEST" )
+
+	local defdescheight = ( descborder * 2 ) + fontheight
+
+	local descwidth = ScrW() / 5
+	local descheight = defdescheight
+	local descx = defx - ( descwidth / 2 )
+	local descy = defy - descheight
+
+	-- Calculate height of description
+	descheight = defdescheight
+		if ( spelldesc.Description ) then
+			local _, height = surface.GetTextSize( spelldesc.Description )
+			descheight = descheight + height + fontheight
+		end
+		if ( spelldesc.Random ) then
+			for k, v in pairs( spelldesc.Random ) do
+				descheight = descheight + fontheight
+			end
+		end
+	descy = defy - descheight
+
+	-- Description Backdrop
+	surface.SetDrawColor( 181, 140, 50, backalpha )
+	surface.DrawRect( descx, descy, descwidth, descheight )
+
+	local textx = descx + descborder
+	local texty = descy + descborder
+
+	-- Name of this spell
+	local textcolour = Color( 100, 200, 255, 255 )
+	draw.DrawText( spelldesc.Name, font, textx, texty, textcolour, TEXT_ALIGN_LEFT )
+
+	-- Cooldown of this spell
+	if ( cooldown > 0 ) then
+		local textx = descx + descwidth - descborder
+
+		local textcolour = Color( 100, 255, 150, 255 )
+		draw.DrawText( cooldown .. "s", font, textx, texty, textcolour, TEXT_ALIGN_RIGHT )
+	end
+
+	-- Description of this spell
+	if ( spelldesc.Description ) then
+		texty = texty + textspacing
+
+		local textcolour = Color( 180, 180, 180, 255 )
+		draw.DrawText( spelldesc.Description, "TargetIDSmall", textx, texty, textcolour, TEXT_ALIGN_LEFT )
+	end
+
+	-- Randomized values of this spell
+	if ( spelldesc.Random ) then
+		for k, v in pairs( spelldesc.Random ) do
+			texty = texty + textspacing
+
+			-- Display name of random property and it's value on this spell
+			local textcolour = Color( 200, 200, 200, 255 )
+			local name = k
+				if ( name == "ManaUsage" ) then
+					name = "Mana"
+				end
+			local text = name .. ": " .. spellval[k] .. " "
+			draw.DrawText( text, font, textx, texty, textcolour, TEXT_ALIGN_LEFT )
+
+			-- Display difference between this spell's values and the original
+			if ( v.Min ~= spellval[k] ) then
+				surface.SetFont( font )
+				local textwidth = surface.GetTextSize( text )
+				local textcolour = Color( 100, 255, 150, 255 )
+				local text = "("
+					if ( spellval[k] > v.Min ) then
+						text = text .. "+"
+					end
+				draw.DrawText( text .. spellval[k] - v.Min .. ")", font, textx + textwidth, texty, textcolour, TEXT_ALIGN_LEFT )
+			end
+		end
+	end
+
+	return descheight
 end
 
 -- Display information about the overall location and state of all control points

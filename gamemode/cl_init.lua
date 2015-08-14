@@ -44,6 +44,8 @@ end
 
 function GM:Think()
 	self.BaseClass:Think()
+
+	self:Think_HUD()
 end
 
 -- Setup view model hands for cast weapon

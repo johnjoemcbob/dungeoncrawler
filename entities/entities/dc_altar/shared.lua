@@ -198,13 +198,13 @@ function ENT:OpenMenu()
 					offset:Rotate(-v:GetAngles():Forward():Angle())
 					xamt = -offset.y
 					yamt = offset.x
-					
+
 					if(xamt > -3 and xamt < 3) then
 						if(yamt > -4 and yamt < 4) then
 							-- HIT A SPELL CARD
 							v:SetColor(Color(0, 0, 0, 255))
 							lookingAtCard = v
-							
+
 						end
 					end
 
@@ -216,7 +216,9 @@ function ENT:OpenMenu()
 				
 				i = i + 1
 			end
-			
+			-- Flag for HUD_Paint
+			LocalPlayer().SpellAltarCard = lookingAtCard
+
 			-- When the player presses use, and is looking at a card...
 			if(LocalPlayer().ChosenCardNum == nil) then
 				LocalPlayer().ChosenCardNum = 1
@@ -225,15 +227,14 @@ function ENT:OpenMenu()
 			if(LocalPlayer():KeyPressed(IN_USE) && lookingAtCard != nil && self.PlayerMenuTime > 250) then
 				-- Left Hand Spell
 				if(LocalPlayer().ChosenCardNum == 1) then
-					
+
 					LocalPlayer().Spells[1] = lookingAtCard.SpellNum
 					lookingAtCard.Spinning = true
 
 					net.Start("player_picked_spell_1")
 					net.WriteInt(lookingAtCard.SpellNum, 32)
 					net.SendToServer()
-					
-					PrintTable(lookingAtCard.AssociatedSpell)
+
 					LocalPlayer().ChosenCardNum = 2
 				else
 				-- Right Hand Spell

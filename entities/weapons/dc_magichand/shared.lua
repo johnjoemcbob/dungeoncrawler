@@ -193,10 +193,7 @@ function SWEP:Cast( spellname )
 		self:Cast_Misc( spell )
 	end
 
-	if ( spell.Cooldown == 0 ) then
-		return 0.01
-	end
-	return ( 1 / spell.Cooldown )
+	return spell.Cooldown
 end
 
 -- Base function for any spells which create world traps to hurt heroes,

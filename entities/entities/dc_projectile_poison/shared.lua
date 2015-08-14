@@ -24,6 +24,8 @@ function ENT:Initialize()
 
 	-- Initialize shared projectile properties
 	self:SetModel( "models/Combine_Helicopter/helicopter_bomb01.mdl" )
+	self:SetMaterial( "models/debug/debugwhite" )
+	self:SetColor( Color( 255, 200, 100 ) )
 	self:SetSolid( SOLID_BBOX )
 
 	-- Initialize the scalable collision model for this projectile
@@ -141,5 +143,6 @@ function ENT:IsSpell()
 end
 
 function ENT:Team()
+	if ( not self.Owner or ( not self.Owner.Team ) ) then return 0 end
 	return self.Owner:Team()
 end
