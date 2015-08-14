@@ -167,6 +167,8 @@ function ENT:OpenMenu()
 					cardmodel:SetModelScale(0.25, 0)
 					cardmodel:SetRenderMode( RENDERMODE_TRANSALPHA )
 					cardmodel.AssociatedSpell = v
+					cardmodel.SpinAmt = 0
+					cardmodel.Spinning = false
 					cardmodel.SpellNum = spellnum
 					spellnum = spellnum + 1
 					self.TotalKnownSpells = self.TotalKnownSpells + 1
@@ -202,6 +204,7 @@ function ENT:OpenMenu()
 							-- HIT A SPELL CARD
 							v:SetColor(Color(0, 0, 0, 255))
 							lookingAtCard = v
+							
 						end
 					end
 
@@ -219,11 +222,12 @@ function ENT:OpenMenu()
 				LocalPlayer().ChosenCardNum = 1
 			end
 			
-			if(LocalPlayer():KeyPressed(IN_USE) && lookingAtCard != nil) then
+			if(LocalPlayer():KeyPressed(IN_USE) && lookingAtCard != nil && self.PlayerMenuTime > 250) then
 				-- Left Hand Spell
 				if(LocalPlayer().ChosenCardNum == 1) then
 					
 					LocalPlayer().Spells[1] = lookingAtCard.SpellNum
+					lookingAtCard.Spinning = true
 
 					net.Start("player_picked_spell_1")
 					net.WriteInt(lookingAtCard.SpellNum, 32)
@@ -235,6 +239,7 @@ function ENT:OpenMenu()
 				-- Right Hand Spell
 				
 					LocalPlayer().Spells[2] = lookingAtCard.SpellNum
+					lookingAtCard.Spinning = true
 
 					net.Start("player_picked_spell_2")
 					net.WriteInt(lookingAtCard.SpellNum, 32)
@@ -270,9 +275,15 @@ end
 function ENT:DrawSpellCard(cardmodel, cardinfo, cardnum, rotamt)
 
 	if( CLIENT ) then
-		if(cardinfo != nil) then
+		if(cardinfo != nil && cardmodel != nil && IsValid(cardmodel)) then
 			-- rotation / movement / floating stuff
-			cardmodel:SetPos(self:GetPos() + (self:GetAngles():Right() * ((60 * cardnum / self.TotalKnownSpells) - 35) ) + (self:GetAngles():Up() * (40 + math.sin(CurTime() + cardnum) * 1)))
+			if(cardmodel.Spinning == true) then
+				cardmodel.SpinAmt = cardmodel.SpinAmt + 1
+				if(cardmodel.SpinAmt > 10) then
+					cardmodel.SpinAmt = 10
+				end
+			end
+			cardmodel:SetPos(self:GetPos() + (self:GetAngles():Forward() * cardmodel.SpinAmt) + (self:GetAngles():Right() * ((60 * cardnum / self.TotalKnownSpells) - 35) ) + (self:GetAngles():Up() * (40 + math.sin(CurTime() + cardnum) * 1)))
 			cardmodel:SetAngles(self:GetAngles() + Angle(-90 - rotamt, 0, 0))
 			cardmodel:SetColor( Color(255, 255, 255, 255) )
 
