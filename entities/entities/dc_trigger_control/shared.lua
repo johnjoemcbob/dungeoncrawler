@@ -217,6 +217,11 @@ if SERVER then
 						self:SendClientInformation_Capture( ply )
 					end
 
+					-- Unlock any chests around this point
+					for k, chest in pairs( ents.FindByClass( "dc_chest_map" ) ) do
+						chest:ControlPointCaptured( self.ID )
+					end
+
 					-- Check for round end; if this was the last point then heroes have won
 					GAMEMODE:CheckEndConditions()
 				end

@@ -356,7 +356,7 @@ end
 function GM:HUDPaint_Spell_Tooltip( defx, defy, spelldesc, spellval, cooldown, backalpha )
 	if ( not backalpha ) then backalpha = 200 end
 
-	local textspacing = ScrH() / 30
+	local textspacing = ScrH() / 40
 	local descborder = ScrH() / 30
 
 	local font = "TargetID"

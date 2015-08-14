@@ -5,6 +5,8 @@
 -- like the normal chests they spawn loot when a hero is close and no
 -- monsters are, and if it is not inside a monster control point
 
+local Material_Padlock = Material( "icon16/lock.png" )
+
 if SERVER then
 	AddCSLuaFile( "shared.lua" )
 end
@@ -40,6 +42,10 @@ ENT.Loot = nil
 -- The particle system deployed as this chest opens
 ENT.OpenEffect = nil
 
+function ENT:SetupDataTables()
+	self:NetworkVar( "Int", 0, "Locked" )
+end
+
 function ENT:Initialize()
 	if SERVER then
 		-- Find the chest by the closest rotating 'door' (the lid)
@@ -63,6 +69,11 @@ function ENT:Initialize()
 
 		-- Lock the chest to begin with
 		self.Chest:Fire( "lock" )
+
+		-- Display a padlock if the chest has a preceding point
+		if ( self.PrecedingPoint ) then
+			self:SetLocked( self.PrecedingPoint )
+		end
 	end
 end
 
@@ -112,8 +123,20 @@ if SERVER then
 			effectdata:SetAngles( self:GetAngles() )
 		self.OpenEffect = util.Effect( "dc_chestopen", effectdata )
 
+		-- Play the opening sound
+		self:EmitSound( "ambient/machines/catapult_throw.wav" )
+
 		-- Flag not to give loot more than once
 		self.IsOpen = true
+	end
+
+	function ENT:ControlPointCaptured( point )
+		if ( not self.PrecedingPoint ) then return end
+
+		-- Stop displaying the padlock if the chest is unlocked
+		if ( point >= self.PrecedingPoint ) then
+			self:SetLocked( 0 )
+		end
 	end
 end
 
@@ -121,4 +144,21 @@ if CLIENT then
 	function ENT:Draw()
 		return false
 	end
+
+	hook.Add( "PostDrawOpaqueRenderables", "DC_DrawChestPadlock", function()
+		for k, chest in pairs( ents.FindByClass( "dc_chest_map" ) ) do
+			if ( chest:GetLocked() ~= 0 ) then
+				cam.Start3D2D( chest:GetPos() + ( chest:GetAngles():Forward() * 22 ) + Vector( 0, 0, -25 ), chest:GetAngles() + Angle( 0, 90, 90 ), 1 )
+					surface.SetDrawColor( Color( 255, 255, 255, 255 ) )
+					surface.SetMaterial( Material_Padlock )
+					surface.DrawTexturedRect( -8, -8, 16, 16 )
+				cam.End3D2D()
+				cam.Start3D2D( chest:GetPos() + ( chest:GetAngles():Forward() * 22 ) + Vector( 0, 0, -30 ), chest:GetAngles() + Angle( 0, 90, 90 ), 0.1 )
+					local font = "CloseCaption_Bold"
+					local text = GAMEMODE.ControlPoints[game.GetMap()][chest:GetLocked()].Title
+					draw.SimpleTextOutlined( text, font, 0, 0, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 5, Color( 0, 0, 0, 255 ) )
+				cam.End3D2D()
+			end
+		end
+	end )
 end

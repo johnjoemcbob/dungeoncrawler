@@ -28,6 +28,13 @@ include( "shared.lua" )
 include( "sv_buff.lua" )
 include( "sv_spell.lua" )
 
+-- Resource downloads
+resource.AddFile( "sound/dungeoncrawler/monster01.wav" )
+resource.AddFile( "sound/dungeoncrawler/monster02.wav" )
+resource.AddFile( "sound/dungeoncrawler/monster03.wav" )
+resource.AddFile( "sound/dungeoncrawler/monster04.wav" )
+resource.AddFile( "sound/dungeoncrawler/monster05.wav" )
+
 -- Sends to cl_hud.lua
 util.AddNetworkString( "DC_Client_Round" )
 
@@ -115,6 +122,7 @@ function GM:SpawnMapItems()
 		for k, v in pairs( self.Chests[game.GetMap()] ) do
 			v.Entity = ents.Create( v.Type )
 				v.Entity:SetPos( v.Position )
+				v.Entity:SetAngles( v.Angle )
 				v.Entity.PrecedingPoint = v.PrecedingPoint
 				v.Entity.Level = v.Level
 			v.Entity:Spawn()

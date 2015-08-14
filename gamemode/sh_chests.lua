@@ -19,6 +19,7 @@ table.insert(
 	{
 		Type = "dc_chest_map",
 		Position = Vector( 8808, -55, -350 ),
+		Angle = Angle( 0, 90, 0 ),
 		PrecedingPoint = 0,
 		Level = 0
 	}
@@ -28,7 +29,8 @@ table.insert(
 	GM.Chests["rp_harmonti"],
 	{
 		Type = "dc_chest_map",
-		Position = Vector( 5920, -5490, -410 ),
+		Position = Vector( 5920, -5495, -410 ),
+		Angle = Angle( 0, 90, 0 ),
 		PrecedingPoint = 1,
 		Level = 20
 	}
@@ -38,7 +40,8 @@ table.insert(
 	GM.Chests["rp_harmonti"],
 	{
 		Type = "dc_chest_map",
-		Position = Vector( 6127, -7158, -430 ),
+		Position = Vector( 6127, -7160, -430 ),
+		Angle = Angle( 0, 90, 0 ),
 		PrecedingPoint = 1,
 		Level = 20
 	}
@@ -48,9 +51,10 @@ table.insert(
 	GM.Chests["rp_harmonti"],
 	{
 		Type = "dc_chest_map",
-		Position = Vector( 5267, -7671, -400 ),
-		PrecedingPoint = 2,
-		Level = 40
+		Position = Vector( 5267, -7670, -385 ),
+		Angle = Angle( 0, 90, 0 ),
+		PrecedingPoint = 1,
+		Level = 80
 	}
 )
 -- Chest in the Landebrin keep (important, small)
@@ -59,6 +63,7 @@ table.insert(
 	{
 		Type = "dc_chest_map",
 		Position = Vector( 5228, -6583, -138 ),
+		Angle = Angle( 0, 90, 0 ),
 		PrecedingPoint = 2,
 		Level = 40
 	}
@@ -68,7 +73,8 @@ table.insert(
 	GM.Chests["rp_harmonti"],
 	{
 		Type = "dc_chest_map",
-		Position = Vector( 5289, -6301, 32 ),
+		Position = Vector( 5289, -6298, 32 ),
+		Angle = Angle( 0, -90, 0 ),
 		PrecedingPoint = 2,
 		Level = 50
 	}
@@ -78,7 +84,8 @@ table.insert(
 	GM.Chests["rp_harmonti"],
 	{
 		Type = "dc_chest_map",
-		Position = Vector( 5249, -6591, 368 ),
+		Position = Vector( 5249, -6555, 368 ),
+		Angle = Angle( 0, 90, 0 ),
 		PrecedingPoint = 2,
 		Level = 50
 	}
@@ -88,9 +95,21 @@ table.insert(
 	GM.Chests["rp_harmonti"],
 	{
 		Type = "dc_chest_map",
-		Position = Vector( 5420, -6587, 540 ),
+		Position = Vector( 5420, -6590, 540 ),
+		Angle = Angle( 0, 90, 0 ),
 		PrecedingPoint = 2,
 		Level = 100
+	}
+)
+-- Chest in the Grilleau Watch tower (medium)
+table.insert(
+	GM.Chests["rp_harmonti"],
+	{
+		Type = "dc_chest_map",
+		Position = Vector( 2592, 1323, -346 ),
+		Angle = Angle( 0, 90, 0 ),
+		PrecedingPoint = 3,
+		Level = 60
 	}
 )
 -- Chest in a Grilleau house (small)
@@ -99,6 +118,7 @@ table.insert(
 	{
 		Type = "dc_chest_map",
 		Position = Vector( -1205, 1748, -318 ),
+		Angle = Angle( 0, 90, 0 ),
 		PrecedingPoint = 3,
 		Level = 70
 	}
@@ -109,6 +129,7 @@ table.insert(
 	{
 		Type = "dc_chest_map",
 		Position = Vector( -407, 448, -408 ),
+		Angle = Angle( 0, 90, 0 ),
 		PrecedingPoint = 3,
 		Level = 70
 	}
@@ -119,6 +140,7 @@ table.insert(
 	{
 		Type = "dc_chest_map",
 		Position = Vector( 50, 19, -464 ),
+		Angle = Angle( 0, 90, 0 ),
 		PrecedingPoint = 3,
 		Level = 80
 	}
@@ -129,6 +151,7 @@ table.insert(
 	{
 		Type = "dc_chest_map",
 		Position = Vector( -237, 1784, -434 ),
+		Angle = Angle( 0, 90, 0 ),
 		PrecedingPoint = 4,
 		Level = 80
 	}
@@ -138,7 +161,8 @@ table.insert(
 	GM.Chests["rp_harmonti"],
 	{
 		Type = "dc_chest_map",
-		Position = Vector( -401, 1799, -299 ),
+		Position = Vector( -401, 1799, -260 ),
+		Angle = Angle( 0, 90, 0 ),
 		PrecedingPoint = 4,
 		Level = 90
 	}
@@ -149,6 +173,7 @@ table.insert(
 	{
 		Type = "dc_chest_map",
 		Position = Vector( -430, 1789, 73 ),
+		Angle = Angle( 0, 90, 0 ),
 		PrecedingPoint = 4,
 		Level = 90
 	}
@@ -159,6 +184,7 @@ table.insert(
 	{
 		Type = "dc_chest_map",
 		Position = Vector( -423, 2077, 245 ),
+		Angle = Angle( 0, -90, 0 ),
 		PrecedingPoint = 4,
 		Level = 100
 	}

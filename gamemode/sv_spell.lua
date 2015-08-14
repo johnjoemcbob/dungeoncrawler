@@ -58,6 +58,7 @@ end
 -- NOTE: level here is a percentage to do with which control point the loot was gained near, in order to
 -- give better loot nearer the end of the game (0% - 100%)
 function plymeta:AddSpell( id, level )
+	local raritylevel = level
 	local originalspell = GAMEMODE.Spells[id]
 	local copyspell = {}
 		copyspell.Base = id
@@ -67,10 +68,25 @@ function plymeta:AddSpell( id, level )
 				if ( v.ChanceMultiplier ) then
 					chance = v.ChanceMultiplier
 				end
-			copyspell[k] = v.Min + ( ( v.Max - v.Min ) / 100 * math.random( level * chance, level ) )
+			raritylevel = math.random( level * chance, level )
+			copyspell[k] = v.Min + ( ( v.Max - v.Min ) / 100 * raritylevel )
 		end
 	end
 	table.insert( self.LootedSpells, copyspell )
 
+	-- Send information to the client
 	SendClientLootedSpellInformation( self )
+
+	-- Print to the player's chat to describe what they picked up
+	local rarity = " COMMON"
+		if ( raritylevel > 80 ) then
+			rarity = " LEGENDARY"
+		elseif ( raritylevel > 60 ) then
+			rarity = "n EPIC"
+		elseif ( raritylevel > 40 ) then
+			rarity = " RARE"
+		elseif ( raritylevel > 20 ) then
+			rarity = "n UNCOMMON"
+		end
+	self:ChatPrint( "Picked up a"..rarity.." spell! Find a spell altar to examine it." )
 end
