@@ -272,6 +272,7 @@ end
 function GM:HUDPaint_Spells()
 	if ( LocalPlayer().Ghost ) then return end
 	if ( not LocalPlayer().Spells ) then return end
+	if ( not LocalPlayer():Alive() ) then return end
 
 	local size = ScrH() / 20
 	local x = ScrW() / 4
@@ -287,6 +288,21 @@ function GM:HUDPaint_Spells()
 					surface.SetDrawColor( 181, 140, 50, 200 )
 					surface.DrawRect( x, y, size, size )
 
+					-- Cooldown
+					if ( LocalPlayer():GetActiveWeapon() ) then
+						local cooldown = LocalPlayer():GetActiveWeapon():GetNextPrimaryFire()
+							if ( spell == 2 ) then
+								cooldown = LocalPlayer():GetActiveWeapon():GetNextSecondaryFire()
+							end
+						local multiplier = math.max( cooldown - CurTime(), 0 ) / ( 1 / ( self.Spells[lootedspell.Base].Cooldown or 0.01 ) )
+						surface.SetDrawColor( 50, 200 - ( 200 * multiplier ), 50, 255 )
+						surface.DrawRect(
+							x, y,
+							size - ( size * multiplier ),
+							size
+						)
+					end
+
 					-- Icon
 					surface.SetDrawColor( 255, 255, 255, 255 )
 					surface.SetMaterial( self.Spells[lootedspell.Base].Material	)
@@ -296,6 +312,21 @@ function GM:HUDPaint_Spells()
 				-- Backdrop
 				surface.SetDrawColor( 181, 140, 50, 200 )
 				surface.DrawRect( x, y, size, size )
+
+				-- Cooldown
+				if ( LocalPlayer():GetActiveWeapon() ) then
+					local cooldown = LocalPlayer():GetActiveWeapon():GetNextPrimaryFire()
+						if ( spell == 2 ) then
+							cooldown = LocalPlayer():GetActiveWeapon():GetNextSecondaryFire()
+						end
+					local multiplier = math.max( cooldown - CurTime(), 0 ) / ( 1 / ( self.Spells[LocalPlayer().Spells[spell]].Cooldown or 0.01 ) )
+					surface.SetDrawColor( 50, 200 - ( 200 * multiplier ), 50, 255 )
+					surface.DrawRect(
+						x, y,
+						size - ( size * multiplier ),
+						size
+					)
+				end
 
 				-- Icon
 				surface.SetDrawColor( 255, 255, 255, 255 )

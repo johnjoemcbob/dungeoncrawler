@@ -52,7 +52,7 @@ function CLASS:Loadout( ply )
 		if ( not ply.LootedSpells ) then
 			ply.LootedSpells = {}
 			ply:AddSpell( "dc_projectile_fire", 0 )
-			ply:AddSpell( "dc_totem_light", 0 )
+			ply:AddSpell( "dc_totem_mana", 0 )
 		end
 		ply.Spells = {
 			1,

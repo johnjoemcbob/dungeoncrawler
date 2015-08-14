@@ -20,13 +20,11 @@ SWEP.Primary.ClipSize		= -1
 SWEP.Primary.DefaultClip	= -1
 SWEP.Primary.Automatic		= true
 SWEP.Primary.Ammo			= "none"
-SWEP.Primary.NextCast = 0
 
 SWEP.Secondary.ClipSize		= -1
 SWEP.Secondary.DefaultClip	= -1
 SWEP.Secondary.Automatic	= true
 SWEP.Secondary.Ammo			= "none"
-SWEP.Secondary.NextCast = 0
 
 local AnimTime = 0
 local AnimDir = 1
@@ -54,16 +52,16 @@ end
 
 function SWEP:PrimaryAttack( right )
 	if ( SERVER ) then
-		if ( CurTime() > self.Primary.NextCast ) then
-			self.Primary.NextCast = CurTime() + self:Cast( self.Owner.Spells[1] )
+		if ( CurTime() > self:GetNextPrimaryFire() ) then
+			self:SetNextPrimaryFire( CurTime() + self:Cast( self.Owner.Spells[1] ) )
 		end
 	end
 end
 
 function SWEP:SecondaryAttack()
 	if ( SERVER ) then
-		if ( CurTime() > self.Secondary.NextCast ) then
-			self.Secondary.NextCast = CurTime() + self:Cast( self.Owner.Spells[2] )
+		if ( CurTime() > self:GetNextSecondaryFire() ) then
+			self:SetNextSecondaryFire( CurTime() + self:Cast( self.Owner.Spells[2] ) )
 		end
 	end
 end

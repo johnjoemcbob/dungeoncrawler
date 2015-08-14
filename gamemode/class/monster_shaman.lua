@@ -45,7 +45,8 @@ end
 function CLASS:OnDeath( pl, attacker, dmginfo )
 end
 
-function CLASS:Think( pl )
+function CLASS:Think( ply )
+	ply:SetMana( math.Clamp( ply:GetMana() + 0.1, 0, 100 ) )
 end
 
 function CLASS:Move( pl, mv )

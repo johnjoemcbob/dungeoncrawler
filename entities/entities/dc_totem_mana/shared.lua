@@ -10,44 +10,34 @@ ENT.Type = "anim"
 
 -- The time this totem should last
 -- NOTE: After creation CurTime() is added this to make it the end time
-ENT.Time = 5
-
--- The time between particle effects
-ENT.BetweenEffect = 2
-
--- The runtime until the next particle effect should play
-ENT.NextEffect = 0
+ENT.Time = 10
 
 -- The radius of this totem's effect
-ENT.Radius = 50
+ENT.Radius = 100
 
 function ENT:Initialize()
 	-- Initialize shared totem properties
-	self:SetModel( "models/props_junk/harpoon002a.mdl" )
+	self:SetModel( "models/effects/vol_light256x384.mdl" )
 	self:SetSolid( SOLID_NONE )
-	self:SetPos( self:GetPos() + Vector( 0, 0, 5 ) )
-	self:SetAngles( Angle( -90, 0, 0 ) )
+	self:SetPos( self:GetPos() + Vector( 0, 0, 200 ) )
 
-	if SERVER then
-		-- Physics disabled
-		self:SetMoveType( MOVETYPE_NONE )
-
-		-- Add a head mounted on the spear
-		self.Skull = ents.Create( "prop_dynamic" )
-		self.Skull:SetModel( "models/Gibs/HGIBS.mdl" )
-		self.Skull:SetAngles( Angle( 0, 180, 0 ) )
-		self.Skull:SetPos( self:GetPos() + ( self:GetAngles():Forward() * 50 ) )
-		self.Skull:SetParent( self.Entity )
-	end
+	-- Emit mana bubble particle effect
+	--ParticleEffectAttach( "water_bubble_trail_1", PATTACH_POINT_FOLLOW, self, 0 )
 
 	-- Change to the time at which the entity will be removed
 	self.Time = self.Time + CurTime()
+
+	-- Remove any previous totems
+	if ( self.Owner.Totem and IsValid( self.Owner.Totem ) ) then
+		self.Owner.Totem:Remove()
+	end
+	self.Owner.Totem = self
 end
 
 function ENT:Think()
 	if ( SERVER ) then
 		-- Affect players within range
-		local entsinrange = ents.FindInSphere( self:GetPos(), self.Radius )
+		local entsinrange = ents.FindInSphere( self:GetPos() - Vector( 0, 0, 200 ), self.Radius )
 		for k, v in pairs( entsinrange ) do
 			-- Is a player
 			if ( v:IsPlayer() ) then
@@ -55,16 +45,6 @@ function ENT:Think()
 					v:AddBuff( 6 )
 				end
 			end
-		end
-
-		-- Play particle effect
-		if ( CurTime() > self.NextEffect ) then
-			local effectdata = EffectData()
-				effectdata:SetOrigin( self:GetPos() + ( self:GetAngles():Forward() * 50 ) )
-				effectdata:SetAngles( Angle( 0, 0, 0 ) )
-			util.Effect( "AntlionGib", effectdata, true, true )
-
-			self.NextEffect = CurTime() + self.BetweenEffect
 		end
 
 		-- Remove the totem after its time is up
