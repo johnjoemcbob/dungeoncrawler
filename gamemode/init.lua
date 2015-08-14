@@ -9,11 +9,15 @@ AddCSLuaFile( "cl_hud.lua" )
 AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
 AddCSLuaFile( "sh_controlpoints.lua" )
+AddCSLuaFile( "sh_chests.lua" )
 AddCSLuaFile( "sh_altar_spawns.lua" )
 AddCSLuaFile( "sh_buff.lua" )
 AddCSLuaFile( "class/hero.lua" )
-AddCSLuaFile( "class/monster_undead.lua" )
-AddCSLuaFile( "class/monster_shaman.lua" )
+
+local files = file.Find( "gamemodes/dungeoncrawler/gamemode/class/monster_*", "GAME" )
+for k, file in pairs( files ) do
+	AddCSLuaFile( "class/"..file )
+end
 
 local files = file.Find( "gamemodes/dungeoncrawler/gamemode/spells/dc_*", "GAME" )
 for k, file in pairs( files ) do
@@ -73,6 +77,21 @@ function GM:InitPostEntity()
 end
 
 function GM:SpawnMapItems()
+	-- Remove all trap doors
+	local removeent = {
+		-- Landebrin Keep
+		491,
+		492,
+		493,
+		-- Grilleau Keep
+		496,
+		209,
+		217,
+	}
+	for k, ent in pairs( removeent ) do
+		ents.GetByIndex( ent ):Remove()
+	end
+
 	-- Load trigger positions and other data from sh_controlpoints.lua
 	if ( self.ControlPoints[game.GetMap()] ) then
 		for k, v in pairs( self.ControlPoints[game.GetMap()] ) do
@@ -91,6 +110,17 @@ function GM:SpawnMapItems()
 		end
 	end
 
+	-- Load chest locations from sh_chests.lua
+	if ( self.Chests[game.GetMap()] ) then
+		for k, v in pairs( self.Chests[game.GetMap()] ) do
+			v.Entity = ents.Create( v.Type )
+				v.Entity:SetPos( v.Position )
+				v.Entity.PrecedingPoint = v.PrecedingPoint
+				v.Entity.Level = v.Level
+			v.Entity:Spawn()
+		end
+	end
+
 	-- Spawn spell altars on the map
 	for k, v in pairs( self.AltarSpawns ) do
 		v.Entity = ents.Create( "dc_altar" )
@@ -98,10 +128,6 @@ function GM:SpawnMapItems()
 			v.Entity:SetAngles( v.Rotation )
 		v.Entity:Spawn()
 	end
-
-	local chesttest = ents.Create( "dc_chest_map" )
-	chesttest:SetPos( Vector( 8808, -55, -350 ) )
-	chesttest:Spawn()
 end
 
 function GM:Think()
@@ -153,14 +179,10 @@ function GM:PlayerSpawn( ply )
 	for k, buff in pairs( self.Buffs ) do
 		ply:RemoveBuff( k )
 	end
+	ply:SetMana( 100 )
 
 	-- No players can zoom in this gamemode
 	ply:SetCanZoom( false )
-
-	local newtable = table.shallowcopy( self.Spells["dc_projectile_fire"] )
-		newtable.Name = "Hi"
-	PrintTable( newtable )
-	PrintTable( self.Spells["dc_projectile_fire"] )
 end
 
 function GM:PostPlayerDeath( ply )

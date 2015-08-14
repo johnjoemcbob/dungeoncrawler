@@ -178,6 +178,13 @@ function SWEP:Cast( spellname )
 		end
 	end
 
+	-- Ensure the player has enough mana to cast this spell
+	if ( self.Owner:GetMana() < spell.ManaUsage ) then return 0.01 end
+
+	-- Take mana from player
+	self.Owner:SetMana( self.Owner:GetMana() - spell.ManaUsage )
+
+	-- Run casting logic depending on type
 	if ( spell.Type == "Totem" ) then
 		self:Cast_TrapTotem( spell )
 	elseif ( spell.Type == "Projectile" ) then

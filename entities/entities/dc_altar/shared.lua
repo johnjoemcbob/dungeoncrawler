@@ -157,8 +157,8 @@ function ENT:OpenMenu()
 			if(self.MenuOpened == 0) then
 				local spellnum = 0
 				self.TotalKnownSpells = 0
-				for k, v in pairs(GAMEMODE.Spells) do
-					local cardmodel = ClientsideModel(	"models/props_c17/Frame002a.mdl", RENDERGROUP_BOTH )
+				for k, v in pairs(LocalPlayer().LootedSpells) do
+					local cardmodel = ClientsideModel( "models/props_c17/Frame002a.mdl", RENDERGROUP_BOTH )
 					cardmodel:SetPos(self:GetPos() + self:GetAngles():Up() * 40)
 					cardmodel:SetAngles(self:GetAngles() + Angle(-90, 0, 0))
 					cardmodel:SetModelScale(0.25, 0)
@@ -172,7 +172,7 @@ function ENT:OpenMenu()
 				self.MenuOpened = 1
 			end
 			local i = 1
-			for k, v in pairs(GAMEMODE.Spells) do
+			for k, v in pairs(LocalPlayer().LootedSpells) do
 				self:DrawSpellCard(self.SpellCardModels[i], v, i, (self.PlayerMenuTime / 200 * 90))
 				i = i + 1
 			end
@@ -195,7 +195,7 @@ function ENT:OpenMenu()
 					if(xamt > -3 and xamt < 3) then
 						if(yamt > -4 and yamt < 4) then
 							-- HIT A SPELL CARD
-							print(v.AssociatedSpell.Name)
+							--print(GAMEMODE.Spells[v.AssociatedSpell.Base].Name)
 							v:SetColor(Color(0, 0, 0, 255))
 						end
 					end
@@ -296,22 +296,22 @@ hook.Add( "PostDrawTranslucentRenderables", "AltarMenu", function()
 		--Draw 3D2D icons for cards
 		if(altar.MenuOpened > 0 and altar.PlayerMenuTime > 260) then
 			local i = 1
-			for k, v in pairs(GAMEMODE.Spells) do
+			for k, v in pairs(LocalPlayer().LootedSpells) do
 				
 				cam.Start3D2D( altar.SpellCardModels[i]:GetPos() + altar.SpellCardModels[i]:GetAngles():Right() * 2 + altar.SpellCardModels[i]:GetAngles():Forward() * -0.2, altar.SpellCardModels[i]:GetAngles() + Angle(0, 0, -90 -45) + altar.SpellCardModels[i]:GetAngles():Up():Angle() + Angle(0, -90, 0), 1 )
 					surface.SetDrawColor( Color( 255, 255, 255, altar.AlphaFade ) )
-					surface.SetMaterial(v.Material)
+					surface.SetMaterial(GAMEMODE.Spells[v.Base].Material)
 					surface.SetFont( "HudHintTextSmall" )
 
 					surface.DrawTexturedRect(0, -1.5, 4, 4)
 					
 				cam.End3D2D()
 				
-				cam.Start3D2D( altar.SpellCardModels[i]:GetPos() + altar.SpellCardModels[i]:GetAngles():Right() * 2 + altar.SpellCardModels[i]:GetAngles():Forward() * -0.2, altar.SpellCardModels[i]:GetAngles() + Angle(0, 0, -90 -45) + altar.SpellCardModels[i]:GetAngles():Up():Angle() + Angle(0, -90, 0), 1 / string.len(v.Name) )
+				cam.Start3D2D( altar.SpellCardModels[i]:GetPos() + altar.SpellCardModels[i]:GetAngles():Right() * 2 + altar.SpellCardModels[i]:GetAngles():Forward() * -0.2, altar.SpellCardModels[i]:GetAngles() + Angle(0, 0, -90 -45) + altar.SpellCardModels[i]:GetAngles():Up():Angle() + Angle(0, -90, 0), 1 / string.len(GAMEMODE.Spells[v.Base].Name) )
 					surface.SetTextColor( Color( 255, 255, 255, altar.AlphaFade ) )
 					surface.SetTextPos(-0.5, -30)
 					
-					surface.DrawText(v.Name)
+					surface.DrawText(GAMEMODE.Spells[v.Base].Name)
 				cam.End3D2D()
 				
 				i = i + 1

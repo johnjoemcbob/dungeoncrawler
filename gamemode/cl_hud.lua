@@ -191,10 +191,8 @@ end
 function GM:HUDPaint_Mana()
 	if ( LocalPlayer().Ghost ) then return end
 
-	if ( not LocalPlayer().Mana ) then
-		LocalPlayer().Mana = 100
-		LocalPlayer().MaxMana = 200
-	end
+	LocalPlayer().Mana = LocalPlayer():GetNWString( "dc_mana" )
+	LocalPlayer().MaxMana = 100
 
 	local width = ScrW() / 4
 	local height = ScrH() / 20

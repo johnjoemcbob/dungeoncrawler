@@ -7,7 +7,9 @@ GM.Spells["dc_areaofeffect_groundpound"] =
 	Name = "Ground Pound",
 	Icon = "icon16/vector.png",
 	Type = "Misc",
+	Level = 70,
 	Cooldown = 0.2,
+	ManaUsage = 50,
 	Create = function( self, ply )
 		-- Must be on solid ground to cast
 		if ( not ply:OnGround() ) then return end
@@ -18,6 +20,5 @@ GM.Spells["dc_areaofeffect_groundpound"] =
 			spell:Spawn()
 		return spell
 	end,
-	Range = 500,
-	TotemRotate = true
+	Range = 500
 }

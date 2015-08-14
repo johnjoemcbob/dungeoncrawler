@@ -7,7 +7,9 @@ GM.Spells["dc_projectile_poison"] =
 	Name = "Poisonball",
 	Icon = "icon16/wand.png",
 	Type = "Projectile",
+	Level = -1,
 	Cooldown = 1,
+	ManaUsage = 5,
 	Create = function( self, ply, pos )
 		local angle = Angle( 0, 0, 0 )
 

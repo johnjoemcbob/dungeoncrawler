@@ -7,7 +7,9 @@ GM.Spells["dc_projectile_fire"] =
 	Name = "Fireball",
 	Icon = "icon16/wand.png",
 	Type = "Projectile",
+	Level = 0,
 	Cooldown = 0.4,
+	ManaUsage = 5,
 	Create = function( self, ply, pos )
 		local angle = Angle( 0, 0, 0 )
 
@@ -30,6 +32,10 @@ GM.Spells["dc_projectile_fire"] =
 		Damage = {
 			Min = 5,
 			Max = 25
+		},
+		ManaUsage = {
+			Min = 5,
+			Max = 20
 		}
 	}
 }

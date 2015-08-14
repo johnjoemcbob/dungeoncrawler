@@ -1,7 +1,6 @@
 -- Matthew Cormack (@johnjoemcbob), Nichlas Rager (@dasomeone), Jordan Brown (@DrMelon)
 -- 03/08/15
 -- Control Point placements
--- Placement of control points
 --
 -- NOTE: Indices (i.e. for PrecedingPoint) start at 1, not 0
 -- A PrecedingPoint value of 0 or below can be added to opt out

@@ -43,9 +43,8 @@ GM.RoundText[ROUNDTEXT_WIN_HERO] = {
 }
 
 include( "class/hero.lua" )
-include( "class/monster_undead.lua" )
-include( "class/monster_shaman.lua" )
 include( "sh_controlpoints.lua" )
+include( "sh_chests.lua" )
 include( "sh_altar_spawns.lua" )
 include( "sh_buff.lua" )
 
@@ -54,6 +53,14 @@ GM.Spells = {}
 local files = file.Find( "gamemodes/dungeoncrawler/gamemode/spells/dc_*", "GAME" )
 for k, file in pairs( files ) do
 	include( "spells/"..file )
+end
+
+-- Include all monster classes defined
+local MonsterClasses = {}
+local files = file.Find( "gamemodes/dungeoncrawler/gamemode/class/monster_*", "GAME" )
+for k, file in pairs( files ) do
+	include( "class/"..file )
+	table.insert( MonsterClasses, "class_"..string.sub( file, 1, string.len( file ) - 4 ) )
 end
 
 GM.Name 	= "Dungeon Crawler"
@@ -122,7 +129,7 @@ function GM:CreateTeams()
 	
 	team.SetUp( TEAM_MONSTER, "Monsters", Color( 255, 80, 80 ) )
 	team.SetSpawnPoint( TEAM_MONSTER, "info_player_start", true )
-	team.SetClass( TEAM_MONSTER, { "class_monster_undead", "class_monster_shaman" } )
+	team.SetClass( TEAM_MONSTER, MonsterClasses )
 	
 	team.SetUp( TEAM_SPECTATOR, "Spectators", Color( 200, 200, 200 ), true )
 	team.SetSpawnPoint( TEAM_SPECTATOR, "info_player_start" )

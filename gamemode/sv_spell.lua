@@ -40,9 +40,18 @@ end )
 function GM:PlayerInitialSpawn_Spell( ply )
 	-- Now initialized in the hero class loadout
 	--ply.LootedSpells = {}
+	ply:SetMana( 100 )
 end
 
 local plymeta = FindMetaTable( "Player" )
+
+function plymeta:SetMana( value )
+	self:SetNWFloat( "dc_mana", value )
+end
+
+function plymeta:GetMana()
+	return self:GetNWFloat( "dc_mana" )
+end
 
 -- Store the spell on the player (in their list of possible spells, not equipped)
 -- Also procedurally generates any spell values flagged as random

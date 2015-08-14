@@ -10,7 +10,7 @@ ENT.Type = "anim"
 
 -- Flag for whether or not being near this entity should light the player's way
 ENT.IsLightSource = true
-ENT.LightLevel = 1
+ENT.LightLevel = 3
 
 -- The time this totem should last
 -- NOTE: After creation CurTime() is added this to make it the end time
@@ -33,6 +33,12 @@ function ENT:Initialize()
 
 	-- Start particle effects on the head of the totem
 	ParticleEffectAttach( "fire_small_02", PATTACH_POINT_FOLLOW, self, 1 )
+
+	-- Remove the previous light totem
+	if ( self.Owner.LightTotem ) then
+		self.Owner.LightTotem:Remove()
+	end
+	self.Owner.LightTotem = self
 end
 
 function ENT:Think()

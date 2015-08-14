@@ -169,3 +169,29 @@ table.insert(
 		end
 	}
 )
+table.insert(
+	GM.Buffs,
+	{
+		Name = "Regeneration",
+		Description = "Mana is slowly\nregenerating.",
+		Icon = "icon16/book.png",
+		Time = 1,
+		Team = TEAM_BOTH,
+		Debuff = false,
+		ThinkActivate = function( self, ply )
+			-- This is mostly activated by totems affecting the player
+		end,
+		Init = function( self, ply )
+			
+		end,
+		Think = function( self, ply )
+			if ( ( not ply.NextManaRegen ) or ( CurTime() > ply.NextManaRegen ) ) then
+				ply:SetMana( math.Clamp( ply:GetMana() + 1, 0, 100 ) )
+				ply.NextManaRegen = CurTime() + 0.1
+			end
+		end,
+		Remove = function( self, ply )
+			
+		end
+	}
+)

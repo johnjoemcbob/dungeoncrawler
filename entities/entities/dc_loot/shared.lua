@@ -19,9 +19,16 @@ ENT.Type = "anim"
 ENT.IsLightSource = true
 ENT.LightLevel = 2
 
+-- The radius to give loot to players within
+ENT.Radius = 150
+
+-- The level of this loot
+-- Set by the chest, loaded from sh_chests.lua
+ENT.Level = 0
+
 -- Table containing the heroes which have already claimed loot from
 -- this source
-ENT.HeroesClaimed = {}
+ENT.HeroesClaimed = nil
 
 -- Store the original position of the loot for resetting during animation
 ENT.DefaultPos = nil
@@ -41,6 +48,7 @@ function ENT:Initialize()
 	self:SetModelScale( self.StartScale, 0 )
 
 	self.DefaultPos = self:GetPos()
+	self.HeroesClaimed = {}
 
 	self:SetSolid( SOLID_NONE )
 
@@ -58,7 +66,25 @@ if SERVER then
 			gloweffect:SetAngles( Angle( -90, 0, 0 ) )	
 			gloweffect:SetRadius( 15 )
 		util.Effect( "AR2Explosion", gloweffect, true, true )
-	
+
+		-- Find nearby unclaimed players
+		local entsinrange = ents.FindInSphere( self:GetPos(), self.Radius )
+		for k, ply in pairs( entsinrange ) do
+			if ( ply:IsPlayer() and ply:Alive() ) then
+				if ( not self.HeroesClaimed[ply:EntIndex()] ) then
+					local possiblespells = {}
+						for m, spell in pairs( GAMEMODE.Spells ) do
+							if ( ( spell.Level ~= -1 ) and ( self.Level >= spell.Level ) ) then
+								table.insert( possiblespells, m )
+							end
+						end
+					PrintTable( possiblespells )
+					ply:AddSpell( possiblespells[math.random( 1, #possiblespells )], self.Level )
+
+					self.HeroesClaimed[ply:EntIndex()] = true
+				end
+			end
+		end
 	end
 end
 

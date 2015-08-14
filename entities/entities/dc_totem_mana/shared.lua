@@ -1,6 +1,6 @@
 -- Matthew Cormack (@johnjoemcbob)
--- 08/08/15
--- Shaman monster totem, poisons heroes
+-- 14/08/15
+-- Hero mana regeneration totem
 
 if SERVER then
 	AddCSLuaFile( "shared.lua" )
@@ -10,7 +10,7 @@ ENT.Type = "anim"
 
 -- The time this totem should last
 -- NOTE: After creation CurTime() is added this to make it the end time
-ENT.Time = 30
+ENT.Time = 5
 
 -- The time between particle effects
 ENT.BetweenEffect = 2
@@ -52,7 +52,7 @@ function ENT:Think()
 			-- Is a player
 			if ( v:IsPlayer() ) then
 				if ( v:Team() == TEAM_HERO ) then
-					v:AddBuff( 3 )
+					v:AddBuff( 6 )
 				end
 			end
 		end

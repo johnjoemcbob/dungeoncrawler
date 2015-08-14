@@ -5,9 +5,11 @@
 GM.Spells["dc_totem_shaman"] =
 {
 	Name = "Shaman Totem",
-	Icon = "icon16/joystick.png",
+	Icon = "icon16/flag_purple.png",
 	Type = "Totem",
+	Level = -1,
 	Cooldown = 5,
+	ManaUsage = 25,
 	Create = function( self, ply, trace )
 		local spell = ents.Create( "dc_totem_shaman" )
 			spell:SetPos( trace.HitPos )

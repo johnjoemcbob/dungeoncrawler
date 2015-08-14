@@ -23,25 +23,36 @@ ENT.IsOpen = false
 -- open
 ENT.OpenRadius = 150
 
+-- The point which needs to be captured before this can be opened
+-- Set by init.lua, loaded from sh_chests.lua
+ENT.PrecedingPoint = nil
+
+-- The level of loot this chest will spawn
+-- Set by init.lua, loaded from sh_chests.lua
+ENT.Level = 0
+
 -- The rotating 'door' (lid) of the chest
-ENT.Chest = null
+ENT.Chest = nil
 
 -- The loot entity deployed by this chest
-ENT.Loot = null
+ENT.Loot = nil
 
 -- The particle system deployed as this chest opens
-ENT.OpenEffect = null
+ENT.OpenEffect = nil
 
 function ENT:Initialize()
 	if SERVER then
 		-- Find the chest by the closest rotating 'door' (the lid)
-		local nearents = ents.FindInSphere( self:GetPos(), self.OpenRadius )
+		local nearents = ents.FindInSphere( self:GetPos(), self.OpenRadius * 2 )
 		local distance = -1
 		for k, v in pairs( nearents ) do
 			if ( v:GetClass() == "func_door_rotating" ) then
-				local dist = self:GetPos():Distance( v:GetPos() )
+				local compare = v:GetPos()
+					compare.z = self:GetPos().z -- Compensate for downplacement
+				local dist = self:GetPos():Distance( compare )
 				if ( ( distance == -1 ) or ( dist < distance ) ) then
 					self.Chest = v
+					distance = dist
 				end
 			end
 		end
@@ -49,12 +60,23 @@ function ENT:Initialize()
 		-- Remove physics from this game logic entity
 		self:SetMoveType( MOVETYPE_NONE )
 		self:SetSolid( SOLID_NONE )
+
+		-- Lock the chest to begin with
+		self.Chest:Fire( "lock" )
 	end
 end
 
 if SERVER then
 	function ENT:Think()
-		if ( not self.IsOpen ) then
+		if (
+			( not self.IsOpen ) and
+			(
+				( self.PrecedingPoint == 0 ) or
+				( not GAMEMODE.ControlPoints[game.GetMap()] ) or
+				( not GAMEMODE.ControlPoints[game.GetMap()][self.PrecedingPoint].Entity.MonsterControlled )
+			)
+		)
+		then
 			-- Find nearby heroes/monsters
 			local nearents = ents.FindInSphere( self:GetPos(), self.OpenRadius )
 			for k, v in pairs( nearents ) do
@@ -69,12 +91,20 @@ if SERVER then
 	-- Function in charge of opening the chest model, playing effects & spawning loot
 	function ENT:Open( ply )
 		-- Play the opening animation on the chest
-		self.Chest:Use( ply, self, USE_ON, 1 )
+		self.Chest:Fire( "unlock" )
+		timer.Simple( 0.1, function()
+			self.Chest:Use( ply, self, USE_ON, 1 )
+
+			timer.Simple( 0.1, function()
+				self.Chest:Fire( "lock" )
+			end )
+		end )
 
 		-- Spawn the loot giver
 		self.Loot = ents.Create( "dc_loot" )
 		self.Loot:SetPos( self:GetPos() + self:GetAngles():Up() * 10 )
 		self.Loot:Spawn()
+		self.Loot.Level = self.Level
 
 		-- Spawn the particle system
 		local effectdata = EffectData()
