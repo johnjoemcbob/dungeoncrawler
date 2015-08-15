@@ -619,7 +619,7 @@ hook.Add( "PostDrawOpaqueRenderables", "DC_DrawPlayerHealthBar", function()
 		if ( v ~= LocalPlayer() ) then
 			-- Max distance the health bar will be visible at
 			local distance = v:GetPos():Distance( LocalPlayer():GetPos() )
-			if ( distance < 1000 ) then
+			if ( ( distance < 1000 ) and ( v:Health() > 0 ) ) then
 				-- Initialize sizes
 				local scale = 0.5
 				local width = 48

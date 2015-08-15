@@ -45,14 +45,13 @@ function ENT:Think()
 			-- Is a player
 			if ( v:IsPlayer() ) then
 				if ( v:Team() == TEAM_HERO ) then
-					v:AddBuff( 6 )
+					v:AddBuff( 7 )
 				end
 			end
 		end
 
 		-- Remove the totem after its time is up
 		if ( CurTime() > self.Time ) then
-			
 			self:Remove()
 		end
 	end

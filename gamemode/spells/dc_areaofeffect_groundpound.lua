@@ -12,7 +12,7 @@ GM.Spells["dc_areaofeffect_groundpound"] =
 	ManaUsage = 50,
 	Create = function( self, ply )
 		-- Must be on solid ground to cast
-		if ( not ply:OnGround() ) then return end
+		if ( not ply:OnGround() ) then return false end
 
 		local spell = ents.Create( "dc_areaofeffect_groundpound" )
 			spell:SetPos( ply:GetPos() )

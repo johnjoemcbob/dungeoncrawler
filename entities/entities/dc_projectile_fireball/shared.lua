@@ -22,7 +22,7 @@ ENT.Speed = 1000
 ENT.Range = 2000
 
 -- The radius to apply fire and damage when blowing up
-ENT.Radius = 10
+ENT.Radius = 100
 
 -- The runtime variable containing the starting position of the particle, for out-of-range cleanup purposes
 ENT.StartPos = nil

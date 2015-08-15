@@ -3,7 +3,10 @@
 -- Area of effect ground pound; player launches into the air and activates pound on landing
 
 -- The radius of any touch/area of affect spells
-ENT.Radius = 350
+ENT.Radius = 200
+
+-- The radius of any touch/area of affect spells
+ENT.ZRadius = 200
 
 -- The damage to inflict if this spell affects a player
 ENT.Damage = 30
@@ -47,7 +50,11 @@ function ENT:Think()
 			for k, v in pairs( entsinrange ) do
 				-- Is another player, on another team
 				if ( ( v:IsPlayer() ) and ( v:Team() ~= self.Owner:Team() ) ) then
-					v:TakeDamage( damage, self.Owner, self )
+					-- Check z distance
+					local zdistance = math.abs( self.Owner:GetPos().z - v:GetPos().z )
+					if ( zdistance <= self.ZRadius ) then
+						v:TakeDamage( damage, self.Owner, self )
+					end
 				end
 			end
 

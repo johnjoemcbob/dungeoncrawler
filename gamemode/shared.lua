@@ -89,8 +89,8 @@ GM.NoPlayerFootsteps = false		-- When true, all players have silent footsteps
 GM.PlayerCanNoClip = true			-- When true, players can use noclip without sv_cheats
 GM.TakeFragOnSuicide = true			-- -1 frag on suicide
 
-GM.MaximumDeathLength = 0			-- Player will respawn if death length > this (can be 0 to disable)
-GM.MinimumDeathLength = 0			-- Player has to be dead for at least this long
+GM.MaximumDeathLength = 10			-- Player will respawn if death length > this (can be 0 to disable)
+GM.MinimumDeathLength = 5			-- Player has to be dead for at least this long
 GM.AutomaticTeamBalance = false     -- Teams will be periodically balanced 
 GM.ForceJoinBalancedTeams = false	-- Players won't be allowed to join a team if it has more players than another team
 GM.RealisticFallDamage = true		-- Set to true if you want realistic fall damage instead of the fix 10 damage.

@@ -191,6 +191,22 @@ function GM:PlayerSpawn( ply )
 
 	-- No players can zoom in this gamemode
 	ply:SetCanZoom( false )
+
+	-- Monsters relocate to their most advanced remaining point
+	if ( ply:Team() == TEAM_MONSTER ) then
+		ply.SpawnInvulnerable = CurTime() + 2
+
+		if ( self.ControlPoints[game.GetMap()] ) then
+			for k, point in pairs( self.ControlPoints[game.GetMap()] ) do
+				if ( point.Entity and IsValid( point.Entity ) ) then
+					if ( point.Entity.MonsterControlled ) then
+						ply:SetPos( point.Entity:GetPos() )
+						break
+					end
+				end
+			end
+		end
+	end
 end
 
 function GM:PostPlayerDeath( ply )
@@ -207,6 +223,14 @@ function GM:PlayerDisconnected( ply )
 	if ( ply.TriggerZone and IsValid( ply.TriggerZone ) ) then
 		ply.TriggerZone:RemovePlayer( ply )
 	end
+end
+
+function GM:PlayerShouldTakeDamage( ply, attacker )
+	if ( ply.SpawnInvulnerable and ( CurTime() <= ply.SpawnInvulnerable ) ) then
+		return false
+	end
+
+	return self.BaseClass:PlayerShouldTakeDamage( ply, attacker )
 end
 
 function GM:GetFallDamage( ply, flFallSpeed )
@@ -270,6 +294,9 @@ function GM:OnPreRoundStart( num )
 		-- Now initialized in the hero class loadout
 		ply.LootedSpells = nil
 		ply.Spells = {}
+
+		-- Ensure the player spawns
+		ply:Spawn()
 	end
 
 	-- Cleanup and then spawn all gamemode map items again (e.g. checkpoints)
@@ -297,6 +324,11 @@ end
 
 function GM:OnRoundStart( num )
 	self.BaseClass:OnRoundStart()
+
+	-- Ensure all players spawn
+	for k, ply in pairs( player.GetAll() ) do
+		ply:Spawn()
+	end
 
 	SendClientRoundInformation( ROUNDTEXT_BEGIN, 3 )
 end

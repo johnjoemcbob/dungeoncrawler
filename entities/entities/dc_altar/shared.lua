@@ -31,12 +31,12 @@ ENT.LightLevel = 2
 ENT.Radius = 50
 ENT.Active = false
 ENT.HornsIgnited = false
-ENT.PlayersInRange = {}
+ENT.PlayersInRange = nil
 ENT.PlayerMenuTime = 0
 ENT.DelayedCardFlip = 150
 ENT.AnimStage = 0 
 ENT.MenuOpened = 0
-ENT.SpellCardModels = {}
+ENT.SpellCardModels = nil
 ENT.TotalKnownSpells = 0
 ENT.NextParticle = 0
 ENT.BetweenParticle = 0.5
@@ -48,7 +48,8 @@ function ENT:Initialize()
 	self:SetSolid( SOLID_VPHYSICS )
 	self:SetSolid( SOLID_VPHYSICS )
 	self.DefaultPos = self:GetPos()
-
+	self.SpellCardModels = {}
+	self.PlayersInRange = {}
 
 	-- Store the old angles and reset to default for decoration setup
 	local oldangles = self:GetAngles()
@@ -188,10 +189,10 @@ function ENT:OpenMenu()
 			local i = 1
 			local lookingAtCard = nil
 			for k, v in pairs(self.SpellCardModels) do
+				if ( not IsValid( v ) ) then continue end
+
 				local rayResult = util.IntersectRayWithPlane(LocalPlayer():EyePos(), LocalPlayer():GetAimVector() * 2, v:GetPos(), v:GetAngles():Forward() * -1)
 
-	
-				
 				if(rayResult != nil) then
 					local offset = v:GetPos() - rayResult
 					-- Transform offset by plane normal to find out how far along the plane it is		
@@ -361,7 +362,8 @@ hook.Add( "PostDrawTranslucentRenderables", "AltarMenu", function()
 		if(altar.MenuOpened > 0 and altar.PlayerMenuTime > 260) then
 			local i = 1
 			for k, v in pairs(LocalPlayer().LootedSpells) do
-				
+				if ( ( not altar.SpellCardModels[i] ) or ( not IsValid( altar.SpellCardModels[i] ) ) ) then continue end
+
 				cam.Start3D2D( altar.SpellCardModels[i]:GetPos() + altar.SpellCardModels[i]:GetAngles():Right() * 2 + altar.SpellCardModels[i]:GetAngles():Forward() * -0.2, altar.SpellCardModels[i]:GetAngles() + Angle(0, 0, -90 -45) + altar.SpellCardModels[i]:GetAngles():Up():Angle() + Angle(0, -90, 0), 1 )
 					surface.SetDrawColor( Color( 255, 255, 255, altar.AlphaFade ) )
 					surface.SetMaterial(GAMEMODE.Spells[v.Base].Material)

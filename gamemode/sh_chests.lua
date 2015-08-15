@@ -84,7 +84,7 @@ table.insert(
 	GM.Chests["rp_harmonti"],
 	{
 		Type = "dc_chest_map",
-		Position = Vector( 5249, -6555, 368 ),
+		Position = Vector( 5249, -6580, 368 ),
 		Angle = Angle( 0, 90, 0 ),
 		PrecedingPoint = 2,
 		Level = 50

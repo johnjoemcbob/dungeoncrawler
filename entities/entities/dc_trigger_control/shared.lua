@@ -146,7 +146,7 @@ if SERVER then
 
 	function ENT:RemovePlayer( ply )
 		-- Guard against removing the player when they disconnected as server host, and no longer exist
-		if ( not ply ) then return end
+		if ( ( not ply ) or ( not IsValid( ply ) ) ) then return end
 
 		self.PlayersContained[ply:EntIndex()] = nil
 
@@ -171,7 +171,12 @@ if SERVER then
 				if ( ( ply:Team() == TEAM_HERO ) and ( not ply.Ghost ) ) then
 					heroes = ( heroes or 0 ) + 1
 				elseif ( ply:Team() == TEAM_MONSTER ) then
-					monsters = true
+					-- Monster hasn't just spawned
+					if ( ( not ply.SpawnInvulnerable ) or ( CurTime() > ply.SpawnInvulnerable ) ) then
+						monsters = true
+					else
+						self.CheckNumbers = true
+					end
 				end
 			end
 			-- Heroes are present and monsters aren't, capture
@@ -195,6 +200,12 @@ if SERVER then
 	end
 
 	function ENT:Think()
+		-- Flagged to check team numbers again
+		if ( self.CheckNumbers ) then
+			self.CheckNumbers = nil
+			self:CompareTeamNumbers()
+		end
+
 		-- Point hasn't been captured
 		if ( self.MonsterControlled ) then
 			-- Heroes are capturing

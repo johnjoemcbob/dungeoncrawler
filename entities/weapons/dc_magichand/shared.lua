@@ -162,6 +162,8 @@ function SWEP:Think()
 end
 
 function SWEP:Cast( spellname )
+	if ( self.Owner.SpawnInvulnerable and ( CurTime() <= self.Owner.SpawnInvulnerable ) ) then return 0 end
+
 	-- Simple monster spell, has not random qualities
 	if ( type( spellname ) == "string" ) then
 		spell = GAMEMODE.Spells[spellname]
@@ -179,19 +181,31 @@ function SWEP:Cast( spellname )
 	-- Ensure the player has enough mana to cast this spell
 	if ( self.Owner:GetMana() < spell.ManaUsage ) then return 0.01 end
 
-	-- Take mana from player
-	self.Owner:SetMana( self.Owner:GetMana() - spell.ManaUsage )
-
 	-- Run casting logic depending on type
 	if ( spell.Type == "Totem" ) then
-		self:Cast_TrapTotem( spell )
+		local cast = self:Cast_TrapTotem( spell )
+		if ( cast == false ) then
+			return 0
+		end
 	elseif ( spell.Type == "Projectile" ) then
-		self:Cast_Projectile( spell )
+		local cast = self:Cast_Projectile( spell )
+		if ( cast == false ) then
+			return 0
+		end
 	elseif ( spell.Type == "Touch" ) then
-		self:Cast_Touch( spell )
+		local cast = self:Cast_Touch( spell )
+		if ( cast == false ) then
+			return 0
+		end
 	elseif ( spell.Type == "Misc" ) then
-		self:Cast_Misc( spell )
+		local cast = self:Cast_Misc( spell )
+		if ( cast == false ) then
+			return 0
+		end
 	end
+
+	-- Take mana from player
+	self.Owner:SetMana( self.Owner:GetMana() - spell.ManaUsage )
 
 	return spell.Cooldown
 end
@@ -215,13 +229,16 @@ function SWEP:Cast_TrapTotem( spell )
 	end
 
 	-- If it hit something, continue on to creating the trap/totem at the point hit
+	local spellent
 	if ( tr.Hit ) then
-		local spellent = spell:Create( self.Owner, tr )
+		spellent = spell:Create( self.Owner, tr )
 		spellent.Owner = self.Owner
 		if ( spell.TotemRotate ) then
 			self:Cast_TrapTotem_Rotate( spellent, tr )
 		end
 	end
+
+	return spellent
 end
 
 -- Base function used as part of any spells which create world traps to hurt heroes,
@@ -253,6 +270,8 @@ function SWEP:Cast_Projectile( spell )
 	if ( physics and IsValid( physics ) ) then
 		physics:AddVelocity( forward * spell.Speed )
 	end
+
+	return spell
 end
 
 -- Base function for any spells which are close proximity
@@ -267,6 +286,8 @@ function SWEP:Cast_Touch( spell )
 			spell:Create( self.Owner, v )
 		end
 	end
+
+	return spell
 end
 
 -- Base function for any spells which have their own logic
@@ -275,4 +296,5 @@ function SWEP:Cast_Misc( spell )
 	if ( spell ) then
 		spell.Owner = self.Owner
 	end
+	return spell
 end

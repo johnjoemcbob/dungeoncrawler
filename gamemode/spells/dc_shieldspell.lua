@@ -14,7 +14,7 @@ GM.Spells["dc_shieldspell"] =
 	Damage = 25,
 	Create = function( self, ply )
 		-- Create 3 shields around player
-	
+
 		-- Play Sound
 		sound.Play("ambient/energy/spark5.wav", ply:GetPos())		
 		
@@ -22,31 +22,25 @@ GM.Spells["dc_shieldspell"] =
 			spell:SetPos( ply:GetPos() + ply:GetAngles():Forward() * 20 )
 			spell.Owner = ply
 			spell.Offset = 0.0
-			spell:Spawn()
+		spell:Spawn()
 			
 		local spell = ents.Create( "dc_shield" )
 			spell:SetPos( ply:GetPos() + ply:GetAngles():Forward() * -20 )
 			spell.Owner = ply
 			spell.Offset = 90
-			spell:Spawn()
+		spell:Spawn()
 
 		local spell = ents.Create( "dc_shield" )
 			spell:SetPos( ply:GetPos() + ply:GetAngles():Right() * 20 )
 			spell.Owner = ply	
 			spell.Offset = 180
-			spell:Spawn()
-			
-			
-			
+		spell:Spawn()
 
+		ply:AddBuff( 4 )
 	end,
 	Random = {
-		Range = {
-			Min = 500,
-			Max = 1000
-		},
 		Cooldown = {
-			Min = 2.0,
+			Min = 5.0,
 			Max = 7.5,
 			ChanceMultiplier = 0.7
 		},
@@ -55,8 +49,8 @@ GM.Spells["dc_shieldspell"] =
 			Max = 40
 		},
 		ManaUsage = {
-			Min = 15,
-			Max = 35
+			Min = 35,
+			Max = 65
 		}
 	}
 }

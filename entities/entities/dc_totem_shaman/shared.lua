@@ -10,7 +10,7 @@ ENT.Type = "anim"
 
 -- The time this totem should last
 -- NOTE: After creation CurTime() is added this to make it the end time
-ENT.Time = 30
+ENT.Time = 20
 
 -- The time between particle effects
 ENT.BetweenEffect = 2
@@ -19,7 +19,7 @@ ENT.BetweenEffect = 2
 ENT.NextEffect = 0
 
 -- The radius of this totem's effect
-ENT.Radius = 50
+ENT.Radius = 100
 
 function ENT:Initialize()
 	-- Initialize shared totem properties
@@ -73,8 +73,9 @@ function ENT:Think()
 			sound.Play("ambient/creatures/flies" .. math.random(1, 5) ..  ".wav", self:GetPos())
 		end
 
+		-- If player dies then remove
 		-- Remove the totem after its time is up
-		if ( CurTime() > self.Time ) then
+		if ( ( CurTime() > self.Time ) or ( not self.Owner:Alive() ) ) then
 			self:Remove()
 		end
 	end

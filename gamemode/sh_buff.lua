@@ -78,7 +78,7 @@ table.insert(
 		end,
 		Init = function( self, ply )
 			ply.OldWalkSpeed = ply:GetWalkSpeed()
-			ply.OldRunSpeed = ply:GetWalkSpeed()
+			ply.OldRunSpeed = ply:GetRunSpeed()
 			ply:SetWalkSpeed( ply:GetWalkSpeed() / 2 )
 			ply:SetRunSpeed( ply:GetRunSpeed() / 2 )
 		end,
@@ -189,6 +189,31 @@ table.insert(
 				ply:SetMana( math.Clamp( ply:GetMana() + 1, 0, 100 ) )
 				ply.NextManaRegen = CurTime() + 0.1
 			end
+		end,
+		Remove = function( self, ply )
+			
+		end
+	}
+)
+table.insert(
+	GM.Buffs,
+	{
+		Name = "Haste",
+		Description = "Spells can be cast\nmore quickly.",
+		Icon = "icon16/clock_go.png",
+		Time = 0.5,
+		Team = TEAM_BOTH,
+		Debuff = false,
+		ThinkActivate = function( self, ply )
+			-- This is mostly activated by totems affecting the player
+		end,
+		Init = function( self, ply )
+			
+		end,
+		Think = function( self, ply )
+			local weapon = ply:GetActiveWeapon()
+			weapon:SetNextPrimaryFire( weapon:GetNextPrimaryFire() - FrameTime() * 5 )
+			weapon:SetNextSecondaryFire( weapon:GetNextSecondaryFire() - FrameTime() * 5 )
 		end,
 		Remove = function( self, ply )
 			

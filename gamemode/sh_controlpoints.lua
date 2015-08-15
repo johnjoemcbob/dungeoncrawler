@@ -30,9 +30,9 @@ table.insert(
 	{
 		Title = "Landebrin Keep",
 		Type = "Default",
-		Position = Vector( 5374, -6448, 300 ),
-		Start = Vector( -180, -180, -450 ),
-		End = Vector( 180, 180, 450 ),
+		Position = Vector( 5374, -6448, 330 ),
+		Start = Vector( -180, -180, -480 ),
+		End = Vector( 180, 180, 420 ),
 		PrecedingPoint = 1,
 		CaptureSpeed = 80,
 		Path = {
@@ -66,9 +66,9 @@ table.insert(
 	{
 		Title = "Grilleau Keep",
 		Type = "Default",
-		Position = Vector( -340, 1952, 20 ),
-		Start = Vector( -196, -196, -450 ),
-		End = Vector( 196, 196, 450 ),
+		Position = Vector( -340, 1952, 30 ),
+		Start = Vector( -196, -196, -460 ),
+		End = Vector( 196, 196, 440 ),
 		PrecedingPoint = 3,
 		CaptureSpeed = 40
 	}
