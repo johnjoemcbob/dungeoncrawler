@@ -4,5 +4,5 @@
 	"title"		"Dungeon Crawler"
 	"maps"		"^dc_"
 	"menusystem"	"1"
-	"workshopid"	"0"
+	"workshopid"	"500037814"
 }
